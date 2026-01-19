@@ -2507,3 +2507,56 @@ body.nuevo-producto-page {
     justify-content: center !important;
   }
 }
+
+/* =========================
+   MOBILE PATCH GLOBAL (Camelot)
+   pegar al FINAL
+========================= */
+@media (max-width: 768px){
+
+  /* 1) En móvil NO bloquees el scroll global */
+  html, body{
+    height: auto !important;
+  }
+  body{
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .app-container{
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    flex-direction: column !important;
+  }
+
+  /* 2) Sidebar arriba, ancho completo */
+  .sidebar{
+    width: 100% !important;
+    height: auto !important;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  /* 3) Colapsable: tu JS hace toggle('collapsed') pero faltaba CSS */
+  .sidebar.collapsed .main-nav,
+  .sidebar.collapsed .sidebar-footer{
+    display: none !important;
+  }
+
+  .main-content{
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* 4) Carrito: botones/forms sin min-width + resumen al 100% */
+  .producto-actions form{
+    min-width: 0 !important; /* pisa inline min-width */
+    flex: 1 1 30% !important;
+  }
+
+  .carrito-total-card{
+    width: 100% !important;
+    min-width: 0 !important;  /* pisa min-width:260px */
+  }
+}
