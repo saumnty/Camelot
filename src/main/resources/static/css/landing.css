@@ -2414,3 +2414,96 @@ body.nuevo-producto-page {
     margin-bottom: 14px;
 }
 
+/* =========================
+   MOBILE FIX (Landing)
+   Pegar al FINAL del archivo
+========================= */
+@media (max-width: 768px){
+
+  /* evita el “corte” por 100vh + overflow hidden */
+  body{
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .app-container{
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  /* Sidebar arriba, ancho completo */
+  .sidebar{
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 12px 12px !important;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  /* Colapsable (ya sirve el botón hamburguesa) */
+  .sidebar.collapsed .main-nav,
+  .sidebar.collapsed .sidebar-footer{
+    display: none !important;
+  }
+
+  /* Nav en filas, que no desborde */
+  .main-nav{
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .nav-link{
+    padding: 10px 10px !important;
+    font-size: 13px !important;
+  }
+
+  .nav-link i{
+    width: auto !important;
+  }
+
+  /* Contenido sin altura fija */
+  .main-content{
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .content-header{
+    padding: 14px 16px !important;
+  }
+
+  .welcome-section{
+    padding: 16px !important;
+  }
+
+  /* Header home apilado */
+  .home-header{
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .home-header .btn-primary{
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Buscador 100% */
+  .tiendas-search-form{
+    flex-direction: column !important;
+  }
+
+  .tiendas-search-form input{
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .tiendas-search-btn{
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
