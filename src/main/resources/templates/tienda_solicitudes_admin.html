@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Solicitudes de dueño</title>
+</head>
+<body>
+
+<h2 th:text="'Solicitudes - ' + ${tienda.nombre}">Solicitudes</h2>
+
+<div th:if="${msg}">
+  <p th:text="${msg}"></p>
+</div>
+
+<h3>Pendientes</h3>
+<table border="1" cellspacing="0" cellpadding="6">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Solicitante</th>
+      <th>Nota</th>
+      <th>Creada</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="s : ${pendientes}">
+      <td th:text="${s.id}">1</td>
+      <td th:text="${s.solicitante.name}">Nombre</td>
+      <td th:text="${s.nota}">nota</td>
+      <td th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</td>
+      <td>
+        <form th:action="@{|/tiendas/${tienda.id}/solicitudes/admin/${s.id}/aprobar|}" method="post" style="display:inline;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit">Aprobar</button>
+        </form>
+
+        <form th:action="@{|/tiendas/${tienda.id}/solicitudes/admin/${s.id}/rechazar|}" method="post" style="display:inline;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit">Rechazar</button>
+        </form>
+      </td>
+    </tr>
+
+    <tr th:if="${#lists.isEmpty(pendientes)}">
+      <td colspan="5">No hay solicitudes pendientes.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr/>
+
+<h3>Historial</h3>
+<table border="1" cellspacing="0" cellpadding="6">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Solicitante</th>
+      <th>Estado</th>
+      <th>Resuelto por</th>
+      <th>Resuelto en</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:each="s : ${historial}">
+      <td th:text="${s.id}">1</td>
+      <td th:text="${s.solicitante.name}">Nombre</td>
+      <td th:text="${s.estado}">PENDIENTE</td>
+      <td th:text="${s.resolvedBy != null ? s.resolvedBy.name : '-'}">-</td>
+      <td th:text="${s.resolvedAt != null ? #temporals.format(s.resolvedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
+    </tr>
+
+    <tr th:if="${#lists.isEmpty(historial)}">
+      <td colspan="5">Sin historial todavía.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <a th:href="@{|/tiendas/${tienda.id}|}">Volver a tienda</a>
+</p>
+
+</body>
+</html>

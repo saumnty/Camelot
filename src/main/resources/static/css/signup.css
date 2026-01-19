@@ -1,0 +1,1233 @@
+article.prose {
+  line-height: 1.75;
+  display: contents
+}
+
+article.prose a {
+  font-weight: 500;
+  text-decoration: underline
+}
+
+article.prose h1 {
+  margin-block: 0 1.23em;
+  font-size: 2.25em;
+  line-height: 1.11
+}
+
+article.prose h2 {
+  margin-block: 2em 1em;
+  font-size: 1.5em;
+  line-height: 1.34
+}
+
+article.prose h3 {
+  margin-block: 1.6em .6em;
+  font-size: 1.25em;
+  line-height: 1.6
+}
+
+article.prose h4 {
+  margin-top: 1.5em;
+  margin-bottom: .5em;
+  line-height: 1.5
+}
+
+article.prose img {
+  width: 100%;
+  margin-block: 2em
+}
+
+article.prose blockquote {
+  margin-block: 1.6em;
+  padding: .75em 1.25em
+}
+
+article.prose ul,
+article.prose ol {
+  padding-inline-start: 1.5em
+}
+
+article.prose table {
+  table-layout: auto;
+  width: 100%;
+  margin: 1.5em 0
+}
+
+article.prose thead th {
+  vertical-align: bottom;
+  font-weight: 600
+}
+
+article.prose tbody td {
+  vertical-align: baseline
+}
+
+article.prose tfoot td {
+  vertical-align: top
+}
+
+article.prose th,
+article.prose td {
+  text-align: start;
+  padding: .75em
+}
+
+article.prose thead th:first-child,
+article.prose tbody td:first-child,
+article.prose tfoot td:first-child {
+  padding-inline-start: 0
+}
+
+article.prose thead th:last-child,
+article.prose tbody td:last-child,
+article.prose tfoot td:last-child {
+  padding-inline-end: 0
+}
+
+article.prose thead {
+  box-shadow: 0 1px #ffffffbf, 0 1px
+}
+
+article.prose tbody tr {
+  box-shadow: 0 1px #ffffffd9, 0 1px
+}
+
+article.prose hr {
+  opacity: .3;
+  margin: 3em 0
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC53FwrK3iLTcvneQg7B5iqpJlhKnPCkaL0UUMJng.woff2)format("woff2");
+  unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC53FwrK3iLTcvneQg7B5iqpJlhKnPCkaL9UUMJng.woff2)format("woff2");
+  unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC53FwrK3iLTcvneQg7B5iqpJlhKnPCkaL1UUMJng.woff2)format("woff2");
+  unicode-range: U+1F??
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC53FwrK3iLTcvneQg7B5iqpJlhKnPCkaL6UUMJng.woff2)format("woff2");
+  unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC53FwrK3iLTcvneQg7B5iqpJlhKnPCkaL2UUMJng.woff2)format("woff2");
+  unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC53FwrK3iLTcvneQg7B5iqpJlhKnPCkaL3UUMJng.woff2)format("woff2");
+  unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC53FwrK3iLTcvneQg7B5iqpJlhKnPCkaL5UUM.woff2)format("woff2");
+  unicode-range: U+??, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcvvYwYL8g.woff2)format("woff2");
+  unicode-range: U+460-52F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcvmYwYL8g.woff2)format("woff2");
+  unicode-range: U+301, U+400-45F, U+490-491, U+4B0-4B1, U+2116
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcvuYwYL8g.woff2)format("woff2");
+  unicode-range: U+1F??
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcvhYwYL8g.woff2)format("woff2");
+  unicode-range: U+370-377, U+37A-37F, U+384-38A, U+38C, U+38E-3A1, U+3A3-3FF
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcvtYwYL8g.woff2)format("woff2");
+  unicode-range: U+102-103, U+110-111, U+128-129, U+168-169, U+1A0-1A1, U+1AF-1B0, U+300-301, U+303-304, U+308-309, U+323, U+329, U+1EA0-1EF9, U+20AB
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcvsYwYL8g.woff2)format("woff2");
+  unicode-range: U+100-2BA, U+2BD-2C5, U+2C7-2CC, U+2CE-2D7, U+2DD-2FF, U+304, U+308, U+329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcCo3FwrK3iLTcviYwY.woff2)format("woff2");
+  unicode-range: U+??, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD
+}
+
+*,
+:before,
+:after {
+  box-sizing: border-box
+}
+
+body {
+  -webkit-font-smoothing: antialiased
+}
+
+textarea:focus-visible {
+  outline: none
+}
+
+button {
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+  -webkit-appearance: none
+}
+
+* {
+  margin: 0;
+  padding: 0
+}
+
+a {
+  color: inherit;
+  -webkit-text-decoration: inherit;
+  text-decoration: inherit
+}
+
+input {
+  font: inherit;
+  background-color: inherit;
+  border: none;
+  outline: none
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: 0 0;
+  border-style: none;
+  width: auto;
+  line-height: normal;
+  overflow: visible
+}
+
+textarea,
+select {
+  font: inherit;
+  background-color: inherit
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block
+}
+
+[data-reaction-click] {
+  cursor: pointer
+}
+
+[data-visible=false] {
+  display: none !important
+}
+
+.before-hidden:before,
+.after-hidden:after {
+  display: none
+}
+
+.before-visible:before,
+.after-visible:after {
+  content: ""
+}
+
+::placeholder {
+  color: inherit;
+  opacity: .54
+}
+
+body * {
+  scrollbar-width: none
+}
+
+body ::-webkit-scrollbar {
+  display: none
+}
+
+[name=honey-pot-field] {
+  display: none !important
+}
+
+.text {
+  white-space: pre-wrap;
+  overflow-wrap: break-word
+}
+
+.pointer-events-none {
+  pointer-events: none
+}
+
+#_ {
+  background-color: #fff;
+  min-height: 100vh;
+  display: grid
+}
+
+#Registro {
+  background-color: #fff;
+  border-radius: 0;
+  width: 1440px;
+  min-width: 1440px;
+  max-width: 1440px;
+  min-height: 400px;
+  max-height: 958px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden
+}
+
+#Header {
+  --f2w-order: 0;
+  border-radius: 0;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 0;
+  width: 1440px;
+  height: 320px;
+  padding: 0;
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0
+}
+
+#Top_Navbar {
+  grid-column-gap: 0px;
+  --f2w-order: 0;
+  background-color: #fff;
+  border: 0 solid #e2e8f0;
+  border-bottom-width: 1px;
+  border-radius: 0;
+  flex-flow: row;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 104px;
+  margin: 0;
+  padding: 36px 48px 35px;
+  display: flex;
+  position: relative;
+  box-shadow: 0 1px 3px #1018281a, 0 1px 2px #1018280f
+}
+
+#Icons {
+  grid-column-gap: 24px;
+  --f2w-order: 0;
+  border-radius: 0;
+  flex-flow: row;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  align-items: start;
+  margin: 0 auto 0 0;
+  padding: 0;
+  display: flex;
+  position: relative
+}
+
+#Icon_inbox {
+  --f2w-order: 0;
+  border-radius: 0;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  position: relative;
+  overflow: hidden
+}
+
+#Icon_arrows_expand,
+#Icon_question_mark_circle {
+  --f2w-order: 1;
+  border-radius: 0;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  position: relative;
+  overflow: hidden
+}
+
+#Icon {
+  --f2w-order: 0;
+  width: 81.3%;
+  height: 81.3%;
+  position: absolute;
+  inset: 9.4%
+}
+
+#Ringku_Logo {
+  grid-column-gap: 8px;
+  --f2w-order: 1;
+  border-radius: 0;
+  flex-flow: row;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 12px 24px;
+  display: flex;
+  position: relative
+}
+
+#Union {
+  --f2w-order: 0;
+  flex-shrink: 0;
+  width: 25px;
+  height: 30px;
+  margin: 0;
+  position: relative
+}
+
+#_571_892 {
+  text-align: left;
+  letter-spacing: -1px;
+  color: #080325;
+  --f2w-order: 1;
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-shrink: 0;
+  width: max-content;
+  margin: 0;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 400;
+  display: inline;
+  position: relative
+}
+
+#__0 {
+  letter-spacing: -1px;
+  color: #080325;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: italic;
+  font-weight: 400
+}
+
+#Content {
+  --f2w-order: 2;
+  border-radius: 0;
+  flex-flow: column;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  align-items: center;
+  row-gap: 24px;
+  margin: 0;
+  padding: 0 48px;
+  display: flex;
+  position: relative
+}
+
+#All_Wallet_Cards {
+  --f2w-order: 0;
+  border-radius: 0;
+  flex-flow: column;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  align-items: start;
+  row-gap: 16px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  position: relative
+}
+
+#Wallet_Cards {
+  --f2w-order: 0;
+  border-radius: 0;
+  flex-flow: column;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  align-items: start;
+  row-gap: 16px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  position: relative
+}
+
+#Wallet_card_row {
+  grid-column-gap: 16px;
+  --f2w-order: 0;
+  border-radius: 0;
+  flex-flow: row;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  align-items: start;
+  width: 1044px;
+  height: 162px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  position: relative
+}
+
+#_571_897 {
+  text-align: left;
+  letter-spacing: -2.4px;
+  color: #000;
+  --f2w-order: 3;
+  -webkit-background-clip: text;
+  background-clip: text;
+  width: 100%;
+  height: 73px;
+  font-family: Inter;
+  font-size: 60px;
+  font-weight: 700;
+  display: inline;
+  position: absolute;
+  top: 180px;
+  left: 552px
+}
+
+#__1 {
+  letter-spacing: -2.4px;
+  color: #000;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 60px;
+  font-weight: 700
+}
+
+#_571_898 {
+  text-align: left;
+  letter-spacing: -.8px;
+  color: #000;
+  --f2w-order: 4;
+  -webkit-background-clip: text;
+  background-clip: text;
+  width: 100%;
+  height: 24px;
+  font-family: Inter;
+  font-size: 20px;
+  font-weight: 400;
+  display: inline;
+  position: absolute;
+  top: 253px;
+  left: 549px;
+  
+}
+
+#__2 {
+  letter-spacing: -.8px;
+  color: #000;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 20px;
+  font-weight: 400;
+  text-align:start;
+}
+
+#Table_Header {
+  grid-column-gap: 4px;
+  --f2w-order: 1;
+  background-color: #f8fafc;
+  border-radius: 0;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: start;
+  width: 670px;
+  padding: 16px;
+  display: flex;
+  position: absolute;
+  top: 346px;
+  left: 385px
+}
+
+#I571_917_9_31 {
+  text-align: left;
+  letter-spacing: -.2px;
+  color: #79808a;
+  --f2w-order: 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-grow: 1;
+  flex-basis: 0;
+  width: 100%;
+  margin: 0;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  display: inline;
+  position: relative
+}
+
+#__3 {
+  letter-spacing: -.2px;
+  color: #79808a;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px
+}
+
+#Table_Header_0 {
+  grid-column-gap: 4px;
+  --f2w-order: 2;
+  background-color: #f8fafc;
+  border-radius: 0;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: start;
+  width: 670px;
+  padding: 16px;
+  display: flex;
+  position: absolute;
+  top: 428px;
+  left: 385px
+}
+
+#I571_919_9_31 {
+  text-align: left;
+  letter-spacing: -.2px;
+  color: #79808a;
+  --f2w-order: 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-grow: 1;
+  flex-basis: 0;
+  width: 100%;
+  margin: 0;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  display: inline;
+  position: relative
+}
+
+#__4 {
+  letter-spacing: -.2px;
+  color: #79808a;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px
+}
+
+#Table_Header_1 {
+  grid-column-gap: 4px;
+  --f2w-order: 3;
+  background-color: #f8fafc;
+  border-radius: 0;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: start;
+  width: 670px;
+  padding: 16px;
+  display: flex;
+  position: absolute;
+  top: 510px;
+  left: 385px
+}
+
+#I571_900_9_31 {
+  text-align: left;
+  letter-spacing: -.2px;
+  color: #79808a;
+  --f2w-order: 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-grow: 1;
+  flex-basis: 0;
+  width: 100%;
+  margin: 0;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  display: inline;
+  position: relative
+}
+
+#__5 {
+  letter-spacing: -.2px;
+  color: #79808a;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px
+}
+
+#Table_Header_2 {
+  grid-column-gap: 4px;
+  --f2w-order: 4;
+  background-color: #f8fafc;
+  border-radius: 0;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: start;
+  width: 670px;
+  padding: 16px;
+  display: flex;
+  position: absolute;
+  top: 592px;
+  left: 385px
+}
+
+#I571_925_9_31 {
+  text-align: left;
+  letter-spacing: -.2px;
+  color: #79808a;
+  --f2w-order: 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-grow: 1;
+  flex-basis: 0;
+  width: 100%;
+  margin: 0;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  display: inline;
+  position: relative
+}
+
+#__6 {
+  letter-spacing: -.2px;
+  color: #79808a;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px
+}
+
+#Table_Header_3 {
+  grid-column-gap: 4px;
+  --f2w-order: 5;
+  background-color: #f8fafc;
+  border-radius: 0;
+  flex-flow: row;
+  justify-content: flex-start;
+  align-items: start;
+  width: 670px;
+  padding: 16px;
+  display: flex;
+  position: absolute;
+  top: 674px;
+  left: 385px
+}
+
+#I571_901_9_31 {
+  text-align: left;
+  letter-spacing: -.2px;
+  color: #79808a;
+  --f2w-order: 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-grow: 1;
+  flex-basis: 0;
+  width: 100%;
+  margin: 0;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  display: inline;
+  position: relative
+}
+
+#__7 {
+  letter-spacing: -.2px;
+  color: #79808a;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px
+}
+
+#submit {
+  grid-column-gap: 8px;
+  --f2w-order: 6;
+  filter: drop-shadow(0 1px 2px #1018280d);
+  background-color: #4f46e5;
+  border-radius: 1000px;
+  flex-flow: row;
+  justify-content: center;
+  align-items: center;
+  width: 215px;
+  padding: 12px 24px;
+  display: flex;
+  position: absolute;
+  top: 520px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#submit1 {
+  grid-column-gap: 8px;
+  --f2w-order: 6;
+  filter: drop-shadow(0 1px 2px #1018280d);
+  background-color: #4f46e5;
+  border-radius: 1000px;
+  flex-flow: row;
+  justify-content: center;
+  align-items: center;
+  width: 215px;
+  padding: 12px 24px;
+  display: flex;
+  position: absolute;
+  top: 756px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#Icon_plus {
+  --f2w-order: 0;
+  border-radius: 0;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  position: relative;
+  overflow: hidden
+}
+
+#I571_902_3_18 {
+  text-align: left;
+  letter-spacing: -.4px;
+  color: #fff;
+  --f2w-order: 1;
+  -webkit-background-clip: text;
+  background-clip: text;
+  flex-shrink: 0;
+  width: max-content;
+  margin: 0;
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  display: inline;
+  position: relative
+}
+
+#__8 {
+  letter-spacing: -.4px;
+  color: #fff;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px
+}
+
+#_571_899 {
+  text-align: left;
+  letter-spacing: -.7px;
+  color: #000;
+  --f2w-order: 7;
+  -webkit-background-clip: text;
+  background-clip: text;
+  width: 1440px;
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 600;
+  display: inline;
+  position: absolute;
+  top: 585px;
+  left: 595px
+}
+
+#_571_899_ {
+  text-align: left;
+  letter-spacing: -.7px;
+  color: #000;
+  --f2w-order: 7;
+  -webkit-background-clip: text;
+  background-clip: text;
+  width: 1440px;
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 600;
+  display: inline;
+  position: absolute;
+  top: 830px;
+  left: 595px
+}
+
+#__10 {
+  letter-spacing: -.7px;
+  color: #000;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 600
+}
+
+#__11 {
+  letter-spacing: -.7px;
+  color: #000;
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-family: Inter;
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: underline
+}
+
+/* ESTE CSS ARREGLA LOS NUEVOS INPUTS 
+    Pégalo en tu <head>
+  */
+
+/* Esto hace que los inputs llenen el 'div' que los contiene 
+    y que sean transparentes, usando el fondo gris original.
+  */
+#Table_Header input,
+#Table_Header_0 input,
+#Table_Header_1 input,
+#Table_Header_2 input,
+#Table_Header_3 input {
+  width: 100%;
+  height: 100%;
+  border: 12px;
+  outline: none;
+  background-color: transparent;
+  padding: 0 16px;
+  /* Añadimos padding para que el texto no pegue al borde */
+
+  /* Replicamos el estilo del texto original */
+  font-family: Inter, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: #333;
+  /* Un color oscuro para el texto que se escribe */
+}
+
+/* Para que el texto del 'placeholder' se parezca al diseño original */
+::placeholder {
+  color: #79808a;
+  font-weight: 600;
+  opacity: 1;
+  /* Firefox */
+}
+
+#submit {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 12px 24px !important;
+}
+
+/* 3. Línea superior completa (navbar full width) */
+#Top_Navbar {
+  width: 100% !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+#Table_Header,
+#Table_Header_0,
+#Table_Header_1,
+#Table_Header_2,
+#Table_Header_3 {
+  border-radius: 12px !important;
+}
+
+/* Que el frame de Figma no sea una caja fija sin scroll */
+#Registro {
+  min-height: 100vh;
+  height: auto;          /* IMPORTANTÍSIMO: quita el alto fijo */
+  overflow: visible;     /* o auto, pero NO hidden */
+  /* Si ves que algo se rompe, puedes añadir un padding abajo */
+  padding-bottom: 2rem;
+}
+
+/* ==============================
+   HEADER FULL-WIDTH (como login)
+   sin cambiar el layout de Figma
+   ============================== */
+
+/* 1) Barra superior siempre a todo lo ancho */
+#Top_Navbar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  width: 100vw;
+  height: 64px;                 /* <- no fijo */
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: none !important;  /* <- estilo “línea”, no pill */
+  z-index: 9999;
+}
+
+/* 2) Como tu #Icons está vacío y solo estorba, lo quitamos */
+#Icons{
+  display: none !important;
+}
+
+/* 3) Logo pegado a la izquierda dentro de la barra */
+#Ringku_Logo{
+  position: fixed !important;   /* <- era fixed, eso causaba el empalme */
+  top: 0 !important;
+  left: 24px !important;
+
+  height: 64px !important;
+  padding: 0 !important;         /* el padding ya lo da Top_Navbar */
+  margin: 0 !important;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  z-index: 10000;
+}
+
+/* Tamaños del logo (ajusta si quieres) */
+#Union{
+  width: 34px;
+  height: 40px;
+}
+
+#_571_892,
+#__0{
+  font-size: 26px;
+  font-style: italic;
+  letter-spacing: -1px;
+  color: #080325;
+}
+
+/* 4) Ícono de ayuda pegado a la derecha (ya está en Top_Navbar) */
+#Icon_question_mark_circle{
+  margin-left: auto !important;
+}
+
+/* 5) Evitar que la barra tape tu contenido (porque ahora es fixed) */
+#Registro{
+  padding-top: 72px;            /* deja espacio para el header */
+}
+#Header{
+  padding-top: 0 !important;    /* no “empujes” extra */
+}
+
+/* ==============================
+   RESPONSIVE sin romper Figma
+   ============================== */
+
+/* 1) El "frame" ya NO fijo a 1440 */
+#Registro{
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 1440px !important;   /* conserva tu diseño original en pantallas grandes */
+  margin: 0 auto !important;
+}
+
+/* 2) Header también fluido */
+#Header{
+  width: 100% !important;
+}
+
+/* 3) Inputs: centrados siempre, respetando ancho de Figma (670) pero con límite responsive */
+#Table_Header,
+#Table_Header_0,
+#Table_Header_1,
+#Table_Header_2,
+#Table_Header_3{
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  width: min(670px, calc(100vw - 48px)) !important; /* 24px padding a cada lado */
+}
+
+/* 4) Botón ya lo tienes centrado, solo aseguramos que no se salga */
+#submit1{
+  width: min(215px, calc(100vw - 48px)) !important;
+}
+
+/* 5) Títulos centrados (sin depender de left:552px) */
+#_571_897,
+#_571_898{
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 48px) !important;
+  text-align: center !important;
+}
+
+/* 6) Footer "Ya tienes cuenta" centrado y responsive */
+#_571_899_,
+#_571_899{
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 48px) !important;
+  text-align: center !important;
+}
+
+/* 7) Ajustes de tipografía en pantallas pequeñas */
+@media (max-width: 768px){
+  #_571_897, #__1{
+    font-size: 38px !important;
+    letter-spacing: -1px !important;
+  }
+
+  #_571_898, #__2{
+    font-size: 15px !important;
+  }
+}
+
+/* 8) Extra pequeño */
+@media (max-width: 420px){
+  #_571_897, #__1{
+    font-size: 32px !important;
+  }
+}
+
+/* ===== POPUP ===== */
+.popup{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 90px;
+  background: rgba(0,0,0,.18);
+  z-index: 20000;
+}
+
+.popup.hidden{
+  display: none;
+}
+
+.popup-card{
+  width: min(520px, calc(100vw - 32px));
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18);
+  padding: 16px 18px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  transform: translateY(-8px);
+  animation: popupIn .18s ease-out forwards;
+}
+
+@keyframes popupIn{
+  to { transform: translateY(0); }
+}
+
+.popup-icon{
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  background: #22c55e; /* verde éxito */
+}
+
+.popup-card.error .popup-icon{
+  background: #ef4444; /* rojo error */
+}
+
+.popup-text h3{
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.popup-text p{
+  margin: 2px 0 0;
+  font-size: 14px;
+  opacity: .85;
+}

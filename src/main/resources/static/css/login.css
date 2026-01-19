@@ -1,0 +1,232 @@
+/* ==================== Tipografía (si ya la cargas global, puedes quitar esto) ==================== */
+
+
+*,
+*::before,
+*::after{ box-sizing: border-box; }
+
+html, body{
+  height: 100%;
+  margin: 0;
+}
+
+.auth-body{
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #ffffff;
+  color: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== Header (look anterior: pill + sombra) ==================== */
+.auth-header{
+  width: 100%;
+  margin: 0;
+  padding: 12px 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+
+  border-radius: 0;          /* 👈 NUNCA pill */
+  box-shadow: none;          /* 👈 sin sombra flotante */
+}
+
+.auth-brand{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-brand-icon{
+  width: 34px;
+  height: 40px;
+}
+
+.auth-brand-text{
+  font-size: 26px;
+  font-style: italic;
+  letter-spacing: -1px;
+  color: #080325;
+}
+
+.auth-help{
+  display: flex;
+  align-items: center;
+}
+
+/* ==================== Main ==================== */
+.auth-main{
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px 60px;
+}
+
+.auth-shell{
+  width: 100%;
+  max-width: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.auth-title{
+  text-align: center;
+}
+
+.auth-title h1{
+  margin: 0;
+  font-size: 60px;
+  font-weight: 800;
+  letter-spacing: -2.4px;
+  color: #000;
+}
+
+.auth-title p{
+  margin: 10px 0 0;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.8px;
+  color: #111827;
+  opacity: 0.85;
+}
+
+/* ==================== Form ==================== */
+.auth-form{
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+}
+
+.auth-field{
+  width: 100%;
+  background-color: #f8fafc;
+  border-radius: 25px;
+  padding: 15px 18px;
+}
+
+.auth-field input{
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.auth-field input::placeholder{
+  color: #79808a;
+  font-weight: 600;
+  opacity: 1;
+}
+
+.auth-button{
+  width: 220px;               /* botón corto como antes */
+  background-color: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 1000px;
+  padding: 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+.auth-button:hover{
+  background-color: #4338ca;
+}
+
+/* ==================== Footer ==================== */
+.auth-footer{
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.auth-footer a{
+  text-decoration: underline;
+  color: #000;
+}
+
+/* Accesibilidad */
+.sr-only{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 768px){
+  .auth-brand-icon{ width: 28px; height: 34px; }
+  .auth-brand-text{ font-size: 20px; }
+
+  .auth-title h1{
+    font-size: 38px;
+    letter-spacing: -1px;
+  }
+
+  .auth-title p{
+    font-size: 15px;
+  }
+
+  .auth-form{
+    max-width: 360px;
+    gap: 14px;
+  }
+
+  .auth-button{
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .auth-footer{
+    font-size: 14px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px){
+  .auth-title h1{ font-size: 32px; }
+}
+/* Reutilizar logo de landing.css sin romper el login */
+#Camelot_Logo{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  height: auto;
+  width: auto;          /* <- MUY IMPORTANTE: no 10% */
+}
+
+#Union{
+  width: 34px;
+  height: 40px;
+}
+
+#Camelot_Text{
+  font-size: 26px;
+  font-style: italic;
+  letter-spacing: -1px;
+  color: #080325;
+}
+

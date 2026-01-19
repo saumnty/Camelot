@@ -1,0 +1,164 @@
+/* =========================================================
+   Camelot - app-shell.css
+   Sidebar + header layout for internal pages (productos, ventas, config, etc.)
+   ========================================================= */
+
+.app-container{
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ---- Sidebar ---- */
+.sidebar{
+  width: 280px;
+  background: var(--sidebar);
+  color: #e5e7eb;
+  border-right: 1px solid rgba(255,255,255,.06);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar-header{
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.logo{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.logo-text{
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: #fcfcfd;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.menu-toggle{
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: #fff;
+  display: none; /* only mobile */
+}
+
+.menu-toggle:hover{ background: rgba(255,255,255,.10); }
+
+.main-nav{
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-link{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: rgba(255,255,255,.80);
+  border: 1px solid transparent;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.nav-link i{ width: 18px; text-align: center; opacity: .95; }
+
+.nav-link:hover{
+  background: rgba(255,255,255,.08);
+  color: #fff;
+}
+
+.nav-link.active{
+  background: rgba(37,99,235,.18);
+  border-color: rgba(37,99,235,.30);
+  color: #fff;
+}
+
+/* Optional footer section if you have profile/logout */
+.profile-section{
+  margin-top: auto;
+  padding: 14px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  display: grid;
+  gap: 10px;
+}
+
+.profile-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.06);
+}
+
+/* ---- Main content ---- */
+.main-content{
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-header{
+  height: var(--header-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 var(--gutter);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.content-body{
+  padding: var(--gutter);
+  min-height: calc(100vh - var(--header-h));
+}
+
+/* ---- Mobile behavior ----
+   If you add/remove the class .sidebar-open on body or .app-container,
+   sidebar becomes an off-canvas drawer.
+*/
+@media (max-width: 960px){
+  .menu-toggle{ display: inline-flex; }
+
+  .sidebar{
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-105%);
+    transition: transform .18s ease;
+    z-index: 40;
+    box-shadow: 0 20px 40px rgba(0,0,0,.25);
+  }
+
+  .app-container.sidebar-open .sidebar{ transform: translateX(0); }
+
+  /* simple overlay using ::before */
+  .app-container.sidebar-open::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(2,6,23,.55);
+    z-index: 35;
+  }
+}

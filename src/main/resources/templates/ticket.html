@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ticket</title>
+
+  <!-- Fuente tipo ticket (monoespaciada). Si no carga, cae a Courier. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --paper: #ffffff;
+      --ink: #111827;
+      --muted: #6b7280;
+      --border: rgba(0,0,0,.14);
+      --btn: #e5e7eb;
+      --btnText: #111827;
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      background: #f3f4f6;
+      color: var(--ink);
+      font-family: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Contenedor centrado (pantalla) */
+    .wrap{
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 12px;
+    }
+
+    /* Ticket tipo 80mm */
+    .ticket{
+      width: 320px;             /* vista en pantalla */
+      max-width: 100%;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15,23,42,.08);
+      overflow: hidden;
+    }
+
+    .ticket-inner{
+      padding: 18px 16px 14px;
+    }
+
+    .brand{
+      text-align: center;
+      padding-bottom: 10px;
+    }
+    .brand .name{
+      font-weight: 700;
+      letter-spacing: .5px;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .brand .meta{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .hr{
+      border-top: 1px dashed var(--border);
+      margin: 12px 0;
+    }
+
+    .row{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .row .k{ color: var(--muted); }
+    .row .v{ text-align: right; }
+
+    .section-title{
+      font-size: 12px;
+      font-weight: 700;
+      margin: 10px 0 6px;
+      letter-spacing: .3px;
+    }
+
+    /* Tabla de items */
+    .items-head, .item{
+      display: grid;
+      grid-template-columns: 1fr 44px 86px; /* desc | qty | subtotal */
+      gap: 10px;
+      font-size: 12px;
+      align-items: baseline;
+    }
+    .items-head{
+      color: var(--muted);
+      font-weight: 600;
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .items{
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .desc{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    .qty, .sub{
+      text-align: right;
+      white-space: nowrap;
+    }
+    .sub small{
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .totals{
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .totals .row{
+      font-size: 12px;
+    }
+    .totals .grand{
+      font-size: 14px;
+      font-weight: 800;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      margin-top: 6px;
+    }
+
+    .footer{
+      text-align: center;
+      padding-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    /* Acciones */
+    .actions{
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 16px 16px;
+      border-top: 1px solid rgba(0,0,0,.06);
+      background: #fafafa;
+    }
+
+    .btn-secondary{
+      appearance: none;
+      border: 1px solid rgba(0,0,0,.08);
+      background: var(--btn);
+      color: var(--btnText);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: transform .08s ease, background-color .15s ease;
+    }
+    .btn-secondary:hover{ background: #d1d5db; }
+    .btn-secondary:active{ transform: scale(.98); }
+
+    /* IMPRESIÓN */
+    @media print{
+      body{ background: #fff; }
+      .wrap{ padding: 0; display: block; }
+      .ticket{
+        width: 80mm;          /* 🔥 “tamaño ticket” */
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .actions{ display: none !important; } /* ocultar botón */
+    }
+
+    .back-btn{
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 20;
+
+        appearance: none;
+        border: 1px solid rgba(0,0,0,.12);
+        background: #e5e7eb;
+        color: #111827;
+
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 12px;
+        text-decoration: none;
+
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        transition: background-color .15s ease, transform .08s ease;
+        }
+
+        .back-btn:hover{
+        background: #d1d5db;
+        }
+
+        .back-btn:active{
+        transform: scale(.97);
+        }
+    
+    @media print{
+        body{ background: #fff; }
+        .wrap{ padding: 0; display: block; }
+        .ticket{
+            width: 80mm;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        .actions{ display: none !important; }
+        .back-btn{ display: none !important; } /* 👈 ESTA */
+    }
+
+    /* ===== MOTIVO EN TICKET (sección tipo recibo) ===== */
+    .motivo-box{
+      margin: 10px 0 12px;
+      padding: 10px 10px 10px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: #fff7ed;             /* suave, tipo warning */
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.45;
+
+      /* “división” visual extra */
+      position: relative;
+    }
+
+    /* Título del motivo */
+    .motivo-box strong{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      margin-bottom: 6px;
+    }
+
+    /* Iconito (opcional, se ve bien en ticket) */
+    .motivo-box strong::before{
+      content: "!";
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.18);
+      color: #7c2d12;
+      background: rgba(0,0,0,.03);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    /* Texto del motivo */
+    .motivo-box span{
+      display: block;
+      color: #7c2d12;
+      overflow-wrap: anywhere; /* por si meten un motivo largo */
+    }
+
+    /* Si quieres que parezca “corte” arriba/abajo como ticket */
+    .motivo-box::before,
+    .motivo-box::after{
+      content: "";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 0;
+      border-top: 1px dashed rgba(0,0,0,.18);
+      opacity: .6;
+    }
+
+    .motivo-box::before{ top: -8px; }
+    .motivo-box::after{ bottom: -8px; }
+
+
+
+  </style>
+</head>
+
+<body>
+    <a th:href="@{/compras}" class="back-btn">
+        Volver a compras
+    </a>
+
+  <div class="wrap">
+    <div class="ticket">
+      <div class="ticket-inner">
+
+        <!-- Encabezado -->
+        <div class="brand">
+          <div class="name" th:text="${compra.tienda.nombre} ?: 'Camelot'">Camelot</div>
+          <div class="meta">
+            <div th:text="'Ticket #' + ${compra.id}">Ticket #123</div>
+            <div th:text="${#temporals.format(compra.fecha,'yyyy-MM-dd HH:mm')}">2025-12-19 22:03</div>
+            <div th:text="'Estado: ' + ${compra.estado}">Estado: PENDIENTE</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Datos cliente (opcional) -->
+        <div class="row">
+          <div class="k">Cliente</div>
+          <div class="v" th:text="${compra.usuario.name} ?: 'Usuario'">Usuario</div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Items -->
+        <div class="section-title">DETALLE</div>
+
+        <div class="items-head">
+          <div>Producto</div>
+          <div style="text-align:right;">Cant</div>
+          <div style="text-align:right;">Importe</div>
+        </div>
+
+        <div class="items">
+          <div class="item" th:each="it : ${compra.items}">
+            <div class="desc" th:text="${it.producto.name}">Coca-Cola 3L</div>
+            <div class="qty" th:text="${it.cantidad}">1</div>
+            <div class="sub">
+              <!-- subtotal = precioUnitario * cantidad -->
+              <span th:text="${#numbers.formatDecimal(it.precioUnitario * it.cantidad, 1, 'POINT', 2, 'POINT')}">0.00</span>
+              <br/>
+              <small th:text="'$' + ${#numbers.formatDecimal(it.precioUnitario,1,'POINT',2,'POINT')} + ' c/u'">$0.00 c/u</small>
+            </div>
+          </div>
+        </div>
+
+        <div th:if="${compra.estado.name() == 'CANCELADA' 
+                  && compra.motivo != null 
+                  && !#strings.isEmpty(compra.motivo)}"
+            class="motivo-box">
+          <strong>Motivo de cancelación:</strong><br/>
+          <span th:text="${compra.motivo}"></span>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Totales -->
+        <div class="totals">
+          <div class="row grand">
+            <div>TOTAL</div>
+            <div class="v">
+              $<span th:text="${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'POINT')}">0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <div>Gracias por tu compra.</div>
+          <div th:if="${compra.estado?.name() == 'PENDIENTE'}">
+            Esta compra está <b>PENDIENTE</b> de validación por la tienda.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Botón imprimir -->
+      <div class="actions">
+        <button class="btn-secondary" type="button" onclick="window.print()">
+          Imprimir
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

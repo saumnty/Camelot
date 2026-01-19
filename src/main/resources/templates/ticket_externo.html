@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ticket externo</title>
+
+  <!-- Fuente tipo ticket (monoespaciada). Si no carga, cae a Courier. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --paper: #ffffff;
+      --ink: #111827;
+      --muted: #6b7280;
+      --border: rgba(0,0,0,.14);
+      --btn: #e5e7eb;
+      --btnText: #111827;
+      --warningBg: #fff7ed;
+      --warningInk: #7c2d12;
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin: 0;
+      background: #f3f4f6;
+      color: var(--ink);
+      font-family: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .wrap{
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 12px;
+    }
+
+    .ticket{
+      width: 320px;
+      max-width: 100%;
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15,23,42,.08);
+      overflow: hidden;
+    }
+
+    .ticket-inner{
+      padding: 18px 16px 14px;
+    }
+
+    .brand{
+      text-align: center;
+      padding-bottom: 10px;
+    }
+    .brand .name{
+      font-weight: 700;
+      letter-spacing: .5px;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .brand .meta{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .hr{
+      border-top: 1px dashed var(--border);
+      margin: 12px 0;
+    }
+
+    .row{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .row .k{ color: var(--muted); }
+    .row .v{ text-align: right; }
+
+    .section-title{
+      font-size: 12px;
+      font-weight: 700;
+      margin: 10px 0 6px;
+      letter-spacing: .3px;
+    }
+
+    .motivo-box{
+      margin: 10px 0 12px;
+      padding: 10px 10px 10px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: var(--warningBg);
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.45;
+      position: relative;
+    }
+
+    .motivo-box strong{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      margin-bottom: 6px;
+    }
+
+    .motivo-box strong::before{
+      content: "!";
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.18);
+      color: var(--warningInk);
+      background: rgba(0,0,0,.03);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .motivo-box span{
+      display: block;
+      color: var(--warningInk);
+      overflow-wrap: anywhere;
+    }
+
+    .motivo-box::before,
+    .motivo-box::after{
+      content: "";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 0;
+      border-top: 1px dashed rgba(0,0,0,.18);
+      opacity: .6;
+    }
+    .motivo-box::before{ top: -8px; }
+    .motivo-box::after{ bottom: -8px; }
+
+    .totals{
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .totals .row{
+      font-size: 12px;
+    }
+    .totals .grand{
+      font-size: 14px;
+      font-weight: 800;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      margin-top: 6px;
+    }
+
+    .footer{
+      text-align: center;
+      padding-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .actions{
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 16px 16px;
+      border-top: 1px solid rgba(0,0,0,.06);
+      background: #fafafa;
+    }
+
+    .btn-secondary{
+      appearance: none;
+      border: 1px solid rgba(0,0,0,.08);
+      background: var(--btn);
+      color: var(--btnText);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: transform .08s ease, background-color .15s ease;
+    }
+    .btn-secondary:hover{ background: #d1d5db; }
+    .btn-secondary:active{ transform: scale(.98); }
+
+    .back-btn{
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 20;
+
+      appearance: none;
+      border: 1px solid rgba(0,0,0,.12);
+      background: #e5e7eb;
+      color: #111827;
+
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      text-decoration: none;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      transition: background-color .15s ease, transform .08s ease;
+    }
+    .back-btn:hover{ background: #d1d5db; }
+    .back-btn:active{ transform: scale(.97); }
+
+    @media print{
+      body{ background: #fff; }
+      .wrap{ padding: 0; display: block; }
+      .ticket{
+        width: 80mm;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .actions{ display: none !important; }
+      .back-btn{ display: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <a th:href="@{/compras}" class="back-btn">
+    Volver a compras
+  </a>
+
+  <div class="wrap">
+    <div class="ticket">
+      <div class="ticket-inner">
+
+        <!-- Encabezado -->
+        <div class="brand">
+          <div class="name"
+               th:text="${externa.tienda != null ? externa.tienda.nombre : 'Camelot'}">Camelot</div>
+          <div class="meta">
+            <div th:text="'Ticket externo #' + ${externa.id}">Ticket externo #123</div>
+            <div th:text="${#temporals.format(externa.createdAt,'yyyy-MM-dd HH:mm')}">2026-01-18 15:20</div>
+            <div><b>Estado:</b> EXTERNA</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Datos -->
+        <div class="row">
+          <div class="k">Fecha</div>
+          <div class="v" th:text="${externa.fecha}">2026-01-18</div>
+        </div>
+
+        <div class="row">
+          <div class="k">Tipo</div>
+          <div class="v"><b>COMPRA EXTERNA</b></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="section-title">DETALLE</div>
+
+        <div class="motivo-box">
+          <strong>Compra registrada fuera del sistema</strong>
+          <span>Este ticket representa un gasto/compra externa y se usa solo para reportes.</span>
+        </div>
+
+        <div class="row">
+          <div class="k">Concepto</div>
+          <div class="v" th:text="${externa.concepto}">Hielo</div>
+        </div>
+
+        <div class="row" th:if="${externa.nota != null && !#strings.isEmpty(externa.nota)}">
+          <div class="k">Nota</div>
+          <div class="v" th:text="${externa.nota}">—</div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- Totales -->
+        <div class="totals">
+          <div class="row grand">
+            <div>TOTAL</div>
+            <div class="v">
+              $<span th:text="${#numbers.formatDecimal(externa.total, 1, 'POINT', 2, 'POINT')}">0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <div>Registro de compra externa.</div>
+          <div>Se descuenta en el <b>Resumen diario</b>.</div>
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <button class="btn-secondary" type="button" onclick="window.print()">
+          Imprimir
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

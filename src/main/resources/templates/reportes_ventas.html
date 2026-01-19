@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camelot - Reporte de ventas</title>
+
+  <link rel="stylesheet" th:href="@{/css/landing.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="nuevo-producto-page">
+
+<header class="simple-header">
+    <div class="simple-logo">
+        <!-- Mismo logo SVG que en el resto de la app -->
+        <svg preserveAspectRatio="none" class="simple-logo-icon"
+             viewBox="0 0 25 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M4.83221 8.31641L4.72284 8.44043C4.69082 8.47473 4.65883 8.50899 4.62909 8.54785C4.5993 8.5868 4.56708 8.62154 4.53729 8.6582C4.50753 8.69484 4.47755 8.73388 4.4455 8.77051L4.29413 8.96289C4.26913 8.99245 4.24625 9.02414 4.22577 9.05371L4.08807 9.24023L4.02167 9.3291C3.61893 9.89812 3.26867 10.5026 2.97479 11.1348L2.92596 11.2402C2.9031 11.2883 2.88307 11.3367 2.86249 11.3848V11.4004C2.84649 11.4347 2.81869 11.469 2.81854 11.501L2.76581 11.625C2.7544 11.6569 2.7411 11.6913 2.72968 11.7188C2.71822 11.7462 2.69745 11.7762 2.69745 11.8037C2.61955 12.0008 2.54578 12.205 2.48163 12.4043C2.46796 12.4408 2.46116 12.4686 2.44745 12.5098C2.43369 12.5509 2.41034 12.592 2.41034 12.6309C2.32787 12.9378 2.24597 13.2545 2.18182 13.5684C2.17042 13.614 2.15841 13.6662 2.15155 13.7051C2.14468 13.744 2.13596 13.7791 2.12909 13.8203C2.12229 13.8614 2.12449 13.9139 2.10858 13.9414C2.09254 13.9689 2.10802 13.9943 2.09198 14.0264C2.0761 14.0583 2.0855 14.0679 2.07635 14.125C2.06718 14.1822 2.05096 14.2394 2.05096 14.292L2.03729 14.3857C2.03042 14.4407 2.01678 14.4984 2.01678 14.5488C2.00768 14.5898 2.00315 14.6286 2.00311 14.665L1.9826 14.8506V14.9746L1.96893 15.1172V15.2754C1.94836 15.5042 1.94745 15.7331 1.94745 15.9619C1.94514 18.2492 2.6234 20.4863 3.89471 22.3877C5.16602 24.289 6.97362 25.7697 9.08807 26.6416C11.2026 27.5135 13.5287 27.7369 15.7707 27.2842C18.0126 26.8314 20.0694 25.7227 21.6799 24.0986L22.1701 23.6055L22.1564 23.5918C22.6796 22.9934 23.1405 22.3434 23.5314 21.6514L24.8879 23.0762C23.9029 24.6643 22.5978 26.0301 21.0558 27.0859C19.5139 28.1418 17.7687 28.8649 15.9318 29.209C14.095 29.5531 12.2065 29.511 10.3869 29.085C8.56734 28.6589 6.85656 27.8582 5.36346 26.7344C3.87049 25.6106 2.6279 24.1881 1.71503 22.5576C0.802125 20.9269 0.238273 19.1231 0.06073 17.2627C-0.116732 15.4025 0.0958389 13.5257 0.683777 11.752C1.27174 9.97812 2.22226 8.34592 3.47577 6.95996L4.83221 8.31641ZM10.2326 8.52246C9.27425 8.9337 8.40196 9.52169 7.66034 10.2549C6.14805 11.7535 5.27499 13.7797 5.22479 15.9082C5.17468 18.0368 5.95067 20.1026 7.39081 21.6709C8.83097 23.2392 10.8233 24.1883 12.9484 24.3193C15.0735 24.4503 17.1665 23.7525 18.7883 22.373L20.1447 23.7295L20.09 23.7773L19.9094 23.9316L19.8127 24.0117L19.716 24.0869L19.6935 24.1035L19.6359 24.1484L19.5422 24.2227L19.4553 24.2861L19.4045 24.3232L19.3342 24.373H19.3205L19.2258 24.4395C19.1113 24.5196 19.0065 24.5889 18.9035 24.6553L18.674 24.7969L18.5344 24.8799L18.4699 24.916C18.266 25.0306 18.0551 25.1414 17.842 25.2422L17.7394 25.292H17.7189L17.6496 25.3223L17.5217 25.3789L17.3791 25.4414L17.2355 25.498L17.1476 25.5332C17.1112 25.5491 17.0724 25.5625 17.0314 25.5762L16.9514 25.6084H16.9328L16.8664 25.6338L16.6115 25.7188L16.5295 25.7432L16.4152 25.7803L16.3391 25.8027H16.3254L16.2658 25.8213L16.1877 25.8418L16.0891 25.8701L15.966 25.9014H15.9201L15.7414 25.9434L15.4709 26L15.3674 26.0186H15.3566L15.2756 26.0322H15.2648L15.1642 26.0488C15.0452 26.0694 14.9211 26.0875 14.7951 26.1035H14.4484L14.3117 26.1172H13.4865C12.1532 26.1198 10.8322 25.858 9.60077 25.3467C8.36953 24.8354 7.25197 24.0848 6.31268 23.1387L6.28046 23.2764C5.33651 22.3321 4.58827 21.2105 4.07831 19.9766C3.56837 18.7427 3.30686 17.4201 3.30878 16.085C3.31072 14.7501 3.5757 13.4285 4.08905 12.1963C4.60249 10.964 5.35446 9.84477 6.30096 8.90332C7.03556 8.17487 7.87635 7.56142 8.79413 7.08398L10.2326 8.52246ZM6.68378 0.907227C9.41095 -0.148129 12.408 -0.286759 15.2209 0.512695C18.0336 1.31213 20.5092 3.00609 22.2736 5.33789C24.0381 7.66983 24.9955 10.5133 25.0002 13.4375C25.0105 16.7782 23.7714 20.0024 21.5266 22.4766L20.1701 21.1201C20.2091 21.0789 20.2438 21.0373 20.2805 20.9961L20.3742 20.8857L20.4592 20.7832L20.551 20.6729L20.7014 20.4785C20.7266 20.4487 20.7501 20.4162 20.7707 20.3887L20.9103 20.2012L20.9748 20.1113C21.3778 19.5428 21.7284 18.9388 22.0217 18.3066C22.0399 18.2724 22.0555 18.2377 22.0715 18.2012L22.134 18.0586V18.043L22.1799 17.9395C22.1958 17.8984 22.2137 17.8549 22.2297 17.8184L22.2961 17.708L22.3312 17.626C22.4068 17.429 22.4797 17.225 22.5461 17.0234C22.5575 16.9868 22.5623 16.9614 22.5783 16.918C22.5943 16.8744 22.6056 16.8306 22.6193 16.7871C22.6995 16.4824 22.7824 16.1635 22.8488 15.8496L22.8762 15.7148C22.883 15.6736 22.8917 15.6389 22.8986 15.5977C22.9054 15.5565 22.9041 15.5082 22.9201 15.4785C22.9359 15.4489 22.9312 15.4235 22.9357 15.3916C22.9403 15.3597 22.9423 15.3527 22.9514 15.2959C22.9605 15.2386 22.9767 15.1787 22.9767 15.126L22.9904 15.0342C22.9973 14.9769 22.9972 14.9104 23.0109 14.8691C23.0246 14.8281 23.0246 14.7894 23.0246 14.7529L23.0461 14.5674C23.0575 14.5262 23.0568 14.4891 23.0568 14.4434V14.1338C23.0774 13.9047 23.0773 13.6754 23.0773 13.4463C23.0767 11.1614 22.3982 8.92803 21.1271 7.0293C19.8559 5.13051 18.0492 3.65145 15.9367 2.78027C13.8241 1.90912 11.5002 1.68492 9.25995 2.13574C7.01977 2.58656 4.96387 3.69206 3.35272 5.3125L2.86249 5.80273L2.87811 5.81934C2.35432 6.41708 1.89323 7.06733 1.50311 7.75977L0.105652 6.3623C1.64755 3.87774 3.95675 1.96261 6.68378 0.907227ZM11.5461 3.30078C13.8197 3.30226 16.0275 4.0671 17.8146 5.47266C19.6017 6.87824 20.8653 8.84348 21.4025 11.0527C21.9398 13.262 21.7197 15.5879 20.7775 17.6572C19.8354 19.7265 18.2254 21.4195 16.2062 22.4648L14.7678 21.0264C15.7458 20.5877 16.6296 19.9633 17.3703 19.1885C18.8827 17.6897 19.7557 15.6628 19.8058 13.5342C19.8558 11.4057 19.0789 9.3406 17.6389 7.77246C16.1988 6.20435 14.2072 5.25508 12.0822 5.12402C9.95705 4.99302 7.86326 5.69081 6.24139 7.07031L4.88495 5.71094L4.94061 5.66309L5.12128 5.50977L5.22675 5.4248L5.32245 5.34668L5.34589 5.33105L5.4035 5.28516L5.49725 5.21387L5.58417 5.15039L5.63202 5.11328L5.70526 5.06055L5.72382 5.04688L5.81073 4.9873C5.92525 4.90943 6.0309 4.83855 6.13397 4.77441L6.22772 4.71484L6.37421 4.625L6.50702 4.54688L6.56952 4.51074C6.7734 4.3962 6.98441 4.28634 7.19745 4.18555L7.30292 4.13477H7.3205L7.38983 4.10547L7.51776 4.04785L7.66034 3.98828L7.80389 3.92871L7.89178 3.89453L8.01093 3.85059L8.08807 3.82129H8.10858L8.17303 3.79785L8.42792 3.71094L8.50995 3.68555L8.62421 3.65137L8.70038 3.62891H8.71405L8.77362 3.61035L8.85175 3.58984L8.95038 3.5625L9.07343 3.53027H9.11932L9.29803 3.48633L9.5705 3.42871L9.67206 3.41113H9.68768L9.76288 3.39746H9.7746L9.87518 3.37891C9.99657 3.35829 10.1184 3.3422 10.2443 3.32617L10.343 3.3125H10.4738L10.59 3.30078H11.5461Z"
+                fill="#080325"></path>
+        </svg>
+        <span class="simple-logo-text">Camelot</span>
+    </div>
+</header>
+
+<main class="nuevo-producto-main">
+  <section class="nuevo-producto-card">
+
+    <h1>Reporte de ventas</h1>
+    <p class="nuevo-producto-subtitle">
+      <span th:text="${tienda != null ? tienda.nombre : 'Tienda'}">Tienda</span>
+      · Ventas confirmadas + utilidad estimada
+    </p>
+
+    <!-- Filtro -->
+    <form method="get" th:action="@{/admin/reportes/ventas}" class="nuevo-producto-form" style="margin-top:8px;">
+      <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="desde">Desde</label>
+          <input type="date" id="desde" name="desde" th:value="${desde}">
+        </div>
+
+        <div class="form-group">
+          <label for="hasta">Hasta</label>
+          <input type="date" id="hasta" name="hasta" th:value="${hasta}">
+        </div>
+
+        <div class="form-group full" style="display:flex; gap:10px; align-items:flex-end; justify-content:flex-end;">
+          <button type="submit" class="btn-primary" style="white-space:nowrap;">
+            <i class="fas fa-filter"></i> Aplicar
+          </button>
+
+          <a class="btn-secondary-link" th:href="@{/compras}" style="white-space:nowrap;">
+            Volver
+          </a>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- ===================== -->
+    <!-- Totales por día -->
+    <!-- ===================== -->
+    <div style="margin-top:16px;">
+      <h2 style="margin:0 0 6px;">Totales por día</h2>
+      <p style="margin:0 0 12px; opacity:.75;">Suma de ventas CONFIRMADAS por fecha.</p>
+
+      <div class="compras-list">
+        <div class="compras-row compras-row-head">
+          <div class="compras-col"><strong>Día</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Ingresos</strong></div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(totalesPorDia)}" class="compras-row compras-row-empty">
+          <div class="compras-col" style="grid-column: 1 / -1; opacity:.7;">
+            No hay ventas confirmadas en este rango.
+          </div>
+        </div>
+
+        <div th:each="r : ${totalesPorDia}" class="compras-row">
+          <div class="compras-col">
+            <span th:text="${r.dia}">2026-01-18</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            $<span th:text="${#numbers.formatDecimal(r.ingresoDia,1,'POINT',2,'POINT')}">0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== -->
+    <!-- Top productos -->
+    <!-- ===================== -->
+    <div style="margin-top:18px;">
+      <h2 style="margin:0 0 6px;">Top productos</h2>
+      <p style="margin:0 0 12px; opacity:.75;">
+        Unidades / ingresos / costo estimado / utilidad (según costoProveedor).
+      </p>
+
+      <div class="compras-list">
+        <div class="compras-row compras-row-head" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+          <div class="compras-col"><strong>Producto</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Unidades</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Ingresos</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Costo</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Utilidad</strong></div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(topProductos)}" class="compras-row compras-row-empty">
+          <div class="compras-col" style="grid-column: 1 / -1; opacity:.7;">
+            No hay datos de productos en este rango.
+          </div>
+        </div>
+
+        <div th:each="p : ${topProductos}" class="compras-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+          <div class="compras-col">
+            <span th:text="${p.productoNombre}">Producto</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            <span th:text="${p.unidades}">0</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            $<span th:text="${#numbers.formatDecimal(p.ingresos,1,'POINT',2,'POINT')}">0.00</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            $<span th:text="${#numbers.formatDecimal(p.costoEstimado,1,'POINT',2,'POINT')}">0.00</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            $<span th:text="${#numbers.formatDecimal(p.utilidadEstimada,1,'POINT',2,'POINT')}">0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== -->
+    <!-- Top categorías -->
+    <!-- ===================== -->
+    <div style="margin-top:18px;">
+      <h2 style="margin:0 0 6px;">Top categorías</h2>
+      <p style="margin:0 0 12px; opacity:.75;">
+        Unidades / ingresos / costo estimado / utilidad por categoría.
+      </p>
+
+      <div class="compras-list">
+        <div class="compras-row compras-row-head" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+          <div class="compras-col"><strong>Categoría</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Unidades</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Ingresos</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Costo</strong></div>
+          <div class="compras-col" style="text-align:right;"><strong>Utilidad</strong></div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(topCategorias)}" class="compras-row compras-row-empty">
+          <div class="compras-col" style="grid-column: 1 / -1; opacity:.7;">
+            No hay datos de categorías en este rango.
+          </div>
+        </div>
+
+        <div th:each="c : ${topCategorias}" class="compras-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+          <div class="compras-col">
+            <span th:text="${c.categoriaNombre}">Categoría</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            <span th:text="${c.unidades}">0</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            $<span th:text="${#numbers.formatDecimal(c.ingresos,1,'POINT',2,'POINT')}">0.00</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            $<span th:text="${#numbers.formatDecimal(c.costoEstimado,1,'POINT',2,'POINT')}">0.00</span>
+          </div>
+
+          <div class="compras-col" style="text-align:right;">
+            $<span th:text="${#numbers.formatDecimal(c.utilidadEstimada,1,'POINT',2,'POINT')}">0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+</body>
+</html>
