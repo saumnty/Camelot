@@ -37,6 +37,8 @@
               method="post"
               class="nuevo-producto-form">
 
+              <input type="hidden" th:field="*{id}">
+
             <!-- ✅ PARA QUE AL EDITAR HAGA UPDATE -->
             <input type="hidden" name="tiendaId"
                 th:value="${tiendaId != null ? tiendaId : (tienda != null ? tienda.id : null)}">

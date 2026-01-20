@@ -223,6 +223,7 @@ public class ProductoControlador {
         model.addAttribute("producto", p);
         model.addAttribute("esEdicion", true);
         model.addAttribute("categorias", categoriaService.listar());
+        model.addAttribute("tiendaId", tiendaId);
 
         if (p.getCategoria() != null && p.getCategoria().getId() != null) {
             model.addAttribute("subcategorias", subcategoriaService.listarPorCategoriaId(p.getCategoria().getId()));
