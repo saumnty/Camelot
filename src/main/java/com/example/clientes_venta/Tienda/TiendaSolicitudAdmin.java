@@ -7,10 +7,10 @@ import com.example.clientes_venta.Usuario.Usuario;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "tienda_solicitud_admin",
-       uniqueConstraints = {
-           @UniqueConstraint(columnNames = {"tienda_id", "solicitante_id", "estado"})
-       })
+// Antes había un UNIQUE(tienda, solicitante, estado): un segundo rechazo al mismo usuario
+// rompía con error. La regla "solo una PENDIENTE" ya la valida el servicio
+// (y la migración SQL agrega un índice parcial).
+@Table(name = "tienda_solicitud_admin")
 public class TiendaSolicitudAdmin {
 
     @Id

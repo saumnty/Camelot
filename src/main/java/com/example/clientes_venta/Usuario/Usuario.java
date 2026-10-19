@@ -71,6 +71,10 @@ public class Usuario implements UserDetails {
     )
     private Rol rol;
 
+    // Opcional: lo usa la tienda para contactar a clientes frecuentes / fiado
+    @Column(length = 30)
+    private String telefono;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -84,7 +84,7 @@ public class TiendaSolicitudAdminController {
         Usuario admin = usuarioRepo.findByEmail(auth.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
 
-        if (!solicitudService.yaEsAdmin(tiendaId, admin)) {
+        if (!solicitudService.puedeResolver(tiendaId, admin)) {
             ra.addFlashAttribute("msg", "No tienes permisos para ver este panel.");
             return "redirect:/tiendas/" + tiendaId;
         }
@@ -109,13 +109,14 @@ public class TiendaSolicitudAdminController {
     public String aprobar(
             @PathVariable Long tiendaId,
             @PathVariable Long solicitudId,
+            @RequestParam(required = false) String volver,
             Authentication auth,
             RedirectAttributes ra
     ) {
         Usuario admin = usuarioRepo.findByEmail(auth.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
 
-        if (!solicitudService.yaEsAdmin(tiendaId, admin)) {
+        if (!solicitudService.puedeResolver(tiendaId, admin)) {
             ra.addFlashAttribute("msg", "No tienes permisos para aprobar solicitudes.");
             return "redirect:/tiendas/" + tiendaId;
         }
@@ -126,7 +127,8 @@ public class TiendaSolicitudAdminController {
 
         solicitudService.aprobar(tiendaId, solicitudId, admin);
         ra.addFlashAttribute("msg", "Solicitud aprobada.");
-        return "redirect:/tiendas/" + tiendaId + "/solicitudes/admin";
+        ra.addFlashAttribute("mensajeExito", "Solicitud de dueño aprobada.");
+        return "buzon".equals(volver) ? "redirect:/notificaciones" : "redirect:/tiendas/" + tiendaId + "/solicitudes/admin";
     }
 
     // ============================================================
@@ -137,13 +139,14 @@ public class TiendaSolicitudAdminController {
     public String rechazar(
             @PathVariable Long tiendaId,
             @PathVariable Long solicitudId,
+            @RequestParam(required = false) String volver,
             Authentication auth,
             RedirectAttributes ra
     ) {
         Usuario admin = usuarioRepo.findByEmail(auth.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
 
-        if (!solicitudService.yaEsAdmin(tiendaId, admin)) {
+        if (!solicitudService.puedeResolver(tiendaId, admin)) {
             ra.addFlashAttribute("msg", "No tienes permisos para rechazar solicitudes.");
             return "redirect:/tiendas/" + tiendaId;
         }
@@ -156,6 +159,7 @@ public class TiendaSolicitudAdminController {
         solicitudService.rechazar(tiendaId, solicitudId, admin);
 
         ra.addFlashAttribute("msg", "Solicitud rechazada.");
-        return "redirect:/tiendas/" + tiendaId + "/solicitudes/admin";
+        ra.addFlashAttribute("mensajeExito", "Solicitud de dueño rechazada.");
+        return "buzon".equals(volver) ? "redirect:/notificaciones" : "redirect:/tiendas/" + tiendaId + "/solicitudes/admin";
     }
 }

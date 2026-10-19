@@ -24,7 +24,7 @@
         <span class="simple-logo-text">Camelot</span>
     </div>
 
-    <a href="/clientes" class="simple-back-link">
+    <a th:href="@{/clientes(tiendaId=${tiendaId}, tab='libreta')}" class="simple-back-link">
         <i class="fas fa-arrow-left"></i>
         Volver al listado de clientes
     </a>
@@ -48,6 +48,7 @@
 
             <!-- ID oculto para que en edición se envíe -->
             <input type="hidden" th:field="*{id}"/>
+            <input type="hidden" name="tiendaId" th:value="${tiendaId}"/>
 
             <div class="form-grid">
                 <!-- Nombre -->
@@ -106,7 +107,7 @@
                         th:text="${esEdicion} ? 'Guardar cambios' : 'Crear cliente'">
                     Crear cliente
                 </button>
-                <a href="/clientes" class="btn-secondary-link">
+                <a th:href="@{/clientes(tiendaId=${tiendaId}, tab='libreta')}" class="btn-secondary-link">
                     Cancelar
                 </a>
             </div>

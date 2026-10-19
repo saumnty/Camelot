@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/sidebar :: head('Mi cuenta')}"></head>
+<body>
+<div class="app-container">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="main-content">
+        <div class="page-wrap">
+            <h1 class="page-title">Mi cuenta</h1>
+            <p class="page-subtitle">Tus datos personales. La configuración de cada tienda está en "Mi tienda".</p>
+
+            <th:block th:replace="~{fragments/sidebar :: flash}"></th:block>
+
+            <section class="panel">
+                <h2>Datos personales</h2>
+                <form th:action="@{/config/cuenta}" method="post">
+                    <div class="campos">
+                        <div class="campo">
+                            <label for="name">Nombre</label>
+                            <input id="name" name="name" type="text" maxlength="120" required th:value="${usuario.name}">
+                        </div>
+                        <div class="campo">
+                            <label for="email">Correo (con el que inicias sesión)</label>
+                            <input id="email" type="email" th:value="${usuario.email}" disabled>
+                        </div>
+                        <div class="campo">
+                            <label for="telefono">Teléfono</label>
+                            <input id="telefono" name="telefono" type="tel" maxlength="30" th:value="${usuario.telefono}"
+                                   placeholder="55 1234 5678">
+                            <small>Lo ven las tiendas donde eres cliente frecuente.</small>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top:16px;">
+                        <button class="btn-primary" type="submit">Guardar</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel">
+                <h2>Cambiar contraseña</h2>
+                <form th:action="@{/config/cuenta/password}" method="post">
+                    <div class="campos">
+                        <div class="campo">
+                            <label for="actual">Contraseña actual</label>
+                            <input id="actual" name="actual" type="password" required autocomplete="current-password">
+                        </div>
+                        <div class="campo">
+                            <label for="nueva">Nueva contraseña</label>
+                            <input id="nueva" name="nueva" type="password" minlength="6" required autocomplete="new-password">
+                        </div>
+                        <div class="campo">
+                            <label for="confirmar">Confirmar nueva</label>
+                            <input id="confirmar" name="confirmar" type="password" minlength="6" required autocomplete="new-password">
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top:16px;">
+                        <button class="btn-primary" type="submit">Actualizar contraseña</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel" th:if="${#lists.isEmpty(navTiendasAdmin)}">
+                <h2>¿Tienes un negocio?</h2>
+                <p class="item-text" style="margin-bottom:12px;">
+                    Crea tu tienda o, si ya existe en Camelot, entra a ella y usa "Soy dueño".
+                </p>
+                <a class="btn-primary" th:href="@{/tiendas/nuevo}">Crear negocio</a>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

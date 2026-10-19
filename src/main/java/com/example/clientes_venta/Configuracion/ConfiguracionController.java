@@ -1,9 +1,9 @@
 package com.example.clientes_venta.Configuracion;
 
-import java.util.List;
-
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,142 +12,180 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.clientes_venta.Tienda.EstadoMembresia;
-import com.example.clientes_venta.Tienda.RolTienda;
+import com.example.clientes_venta.Tienda.Tienda;
+import com.example.clientes_venta.Tienda.TiendaContexto;
+import com.example.clientes_venta.Tienda.TiendaRepository;
 import com.example.clientes_venta.Tienda.TiendaService;
-import com.example.clientes_venta.Tienda.TiendaUsuarioRepository;
+import com.example.clientes_venta.Usuario.Usuario;
 import com.example.clientes_venta.Usuario.UsuarioRepo;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
+/**
+ * Configuración separada en dos:
+ *   /config/cuenta  → cualquier usuario: su nombre, teléfono y contraseña.
+ *   /config/tienda  → SOLO admins de esa tienda: datos del negocio, IVA, pagos, etc.
+ */
 @Controller
-@RequiredArgsConstructor
 public class ConfiguracionController {
 
-    private final ConfiguracionSistemaService configService;
+    private final TiendaContexto contexto;
+    private final TiendaRepository tiendaRepo;
     private final TiendaService tiendaService;
-
-    // Resolver tienda por usuario logeado
+    private final ConfiguracionTiendaService configService;
     private final UsuarioRepo usuarioRepo;
-    private final TiendaUsuarioRepository tiendaUsuarioRepo;
+    private final PasswordEncoder passwordEncoder;
 
+    public ConfiguracionController(TiendaContexto contexto,
+                                   TiendaRepository tiendaRepo,
+                                   TiendaService tiendaService,
+                                   ConfiguracionTiendaService configService,
+                                   UsuarioRepo usuarioRepo,
+                                   PasswordEncoder passwordEncoder) {
+        this.contexto = contexto;
+        this.tiendaRepo = tiendaRepo;
+        this.tiendaService = tiendaService;
+        this.configService = configService;
+        this.usuarioRepo = usuarioRepo;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    // Enlaces viejos a /config siguen funcionando
     @GetMapping("/config")
-    public String mostrarFormularioConfig(
-            Model model,
-            HttpSession session,
-            Authentication auth,
-            @RequestParam(value = "tiendaId", required = false) Long tiendaId
-    ) {
-        Long tiendaIdResuelta = resolverTiendaId(tiendaId, session, auth);
-
-        model.addAttribute("tiendaId", tiendaIdResuelta);
-
-        ConfiguracionSistema config = configService.obtenerConfiguracion();
-
-        // Opcional: mostrar el nombre REAL de la tienda activa en el input
-        if (tiendaIdResuelta != null) {
-            String nombreTienda = tiendaService.obtenerNombreTienda(tiendaIdResuelta);
-            if (nombreTienda != null && !nombreTienda.isBlank()) {
-                config.setNombreNegocio(nombreTienda);
-            }
-        }
-
-        model.addAttribute("config", config);
-        return "config";
+    public String config() {
+        return "redirect:/config/cuenta";
     }
 
-    @PostMapping("/config")
-    public String guardarConfiguracion(
-            @Valid @ModelAttribute("config") ConfiguracionSistema config,
-            BindingResult bindingResult,
-            Model model,
-            RedirectAttributes redirectAttributes,
-            HttpSession session,
-            Authentication auth,
-            @RequestParam(value = "tiendaId", required = false) Long tiendaId
-    ) {
-        Long tiendaIdResuelta = resolverTiendaId(tiendaId, session, auth);
+    // =========================== MI CUENTA ===========================
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("tiendaId", tiendaIdResuelta);
-            model.addAttribute("config", config);
-            return "config";
+    @GetMapping("/config/cuenta")
+    public String cuenta(Authentication auth, Model model) {
+        Usuario u = contexto.usuario(auth);
+        if (u == null) return "redirect:/login";
+        model.addAttribute("usuario", u);
+        return "config_cuenta";
+    }
+
+    @PostMapping("/config/cuenta")
+    @Transactional
+    public String guardarCuenta(@RequestParam String name,
+                                @RequestParam(required = false) String telefono,
+                                Authentication auth,
+                                RedirectAttributes ra) {
+        Usuario u = contexto.usuario(auth);
+        if (u == null) return "redirect:/login";
+
+        String nombre = name == null ? "" : name.trim();
+        if (nombre.isBlank() || nombre.length() > 120) {
+            ra.addFlashAttribute("mensajeError", "El nombre es obligatorio (máximo 120 caracteres).");
+            return "redirect:/config/cuenta";
         }
+        String tel = ConfigTiendaForm.limpio(telefono);
+        if (tel != null && tel.length() > 30) {
+            ra.addFlashAttribute("mensajeError", "El teléfono es demasiado largo.");
+            return "redirect:/config/cuenta";
+        }
+        u.setName(nombre);
+        u.setTelefono(tel);
+        usuarioRepo.save(u);
+        ra.addFlashAttribute("mensajeExito", "Datos de tu cuenta guardados.");
+        return "redirect:/config/cuenta";
+    }
 
-        // 1) Guarda config global
-        configService.guardar(config);
+    @PostMapping("/config/cuenta/password")
+    @Transactional
+    public String cambiarPassword(@RequestParam String actual,
+                                  @RequestParam String nueva,
+                                  @RequestParam String confirmar,
+                                  Authentication auth,
+                                  RedirectAttributes ra) {
+        Usuario u = contexto.usuario(auth);
+        if (u == null) return "redirect:/login";
 
-        // 2) Renombra tienda en BD (tienda.nombre)
-        if (tiendaIdResuelta != null) {
-            tiendaService.actualizarNombreTienda(tiendaIdResuelta, config.getNombreNegocio());
+        if (!passwordEncoder.matches(actual, u.getPassword())) {
+            ra.addFlashAttribute("mensajeError", "La contraseña actual no es correcta.");
+        } else if (nueva == null || nueva.length() < 6) {
+            ra.addFlashAttribute("mensajeError", "La nueva contraseña debe tener al menos 6 caracteres.");
+        } else if (!nueva.equals(confirmar)) {
+            ra.addFlashAttribute("mensajeError", "La confirmación no coincide.");
         } else {
-            redirectAttributes.addFlashAttribute("mensajeError",
-                    "Configuración guardada, pero no se pudo determinar la tienda para renombrarla.");
-            return "redirect:/config";
+            u.setPassword(passwordEncoder.encode(nueva));
+            usuarioRepo.save(u);
+            ra.addFlashAttribute("mensajeExito", "Contraseña actualizada.");
         }
-
-        redirectAttributes.addFlashAttribute("mensajeExito", "Configuración guardada correctamente.");
-        return "redirect:/config?tiendaId=" + tiendaIdResuelta;
+        return "redirect:/config/cuenta";
     }
 
-    private Long resolverTiendaId(Long tiendaIdParam, HttpSession session, Authentication auth) {
+    // ======================= CONFIGURACIÓN DE TIENDA =======================
 
-        // A) Si viene por URL, esa manda (y se guarda en sesión)
-        if (tiendaIdParam != null) {
-            session.setAttribute("tiendaId", tiendaIdParam);
-            return tiendaIdParam;
+    @GetMapping("/config/tienda")
+    public String configTienda(@RequestParam(required = false) Long tiendaId,
+                               Authentication auth,
+                               HttpSession session,
+                               Model model,
+                               RedirectAttributes ra) {
+        Usuario u = contexto.usuario(auth);
+        Long id = contexto.resolverTiendaAdmin(u, tiendaId, session);
+        if (id == null || (tiendaId != null && !id.equals(tiendaId))) {
+            ra.addFlashAttribute("mensajeError", "Solo los administradores de la tienda pueden ver su configuración.");
+            return "redirect:/config/cuenta";
         }
+        Tienda t = tiendaRepo.findById(id).orElseThrow();
+        ConfiguracionTienda c = configService.de(id);
 
-        // B) Si ya hay en sesión, úsala
-        Object tiendaIdObj = session.getAttribute("tiendaId");
-        if (tiendaIdObj != null) {
-            try {
-                return (tiendaIdObj instanceof Long)
-                        ? (Long) tiendaIdObj
-                        : Long.valueOf(tiendaIdObj.toString());
-            } catch (Exception ignored) {
-                // sigue al fallback por usuario
-            }
+        model.addAttribute("tienda", t);
+        model.addAttribute("tiendaId", id);
+        if (!model.containsAttribute("form")) {
+            model.addAttribute("form", ConfigTiendaForm.desde(t, c));
         }
-
-        // C) Fallback: resolver por usuario logeado (ADMIN > CLIENTE)
-        if (auth == null || auth.getName() == null) return null;
-
-        var optU = usuarioRepo.findByEmail(auth.getName());
-        if (optU.isEmpty()) return null;
-
-        Integer userId = optU.get().getId();
-
-        Long id = firstId(
-                tiendaUsuarioRepo.findTiendaIdsByUsuarioRolEstado(
-                        userId,
-                        RolTienda.ADMIN,
-                        EstadoMembresia.ACTIVO
-                )
-        );
-        if (id != null) {
-            session.setAttribute("tiendaId", id);
-            return id;
-        }
-
-        id = firstId(
-                tiendaUsuarioRepo.findTiendaIdsByUsuarioRolEstado(
-                        userId,
-                        RolTienda.CLIENTE,
-                        EstadoMembresia.ACTIVO
-                )
-        );
-        if (id != null) {
-            session.setAttribute("tiendaId", id);
-            return id;
-        }
-
-        return null;
+        return "config_tienda";
     }
 
-    private Long firstId(List<Long> ids) {
-        return (ids != null && !ids.isEmpty()) ? ids.get(0) : null;
+    @PostMapping("/config/tienda")
+    @Transactional
+    public String guardarConfigTienda(@RequestParam Long tiendaId,
+                                      @Valid @ModelAttribute("form") ConfigTiendaForm form,
+                                      BindingResult br,
+                                      Authentication auth,
+                                      Model model,
+                                      RedirectAttributes ra) {
+        Usuario u = contexto.usuario(auth);
+        // Antes cualquiera podía renombrar cualquier tienda: ahora se valida siempre
+        if (!contexto.esAdmin(u, tiendaId)) {
+            ra.addFlashAttribute("mensajeError", "No tienes permisos para configurar esta tienda.");
+            return "redirect:/config/cuenta";
+        }
+        Tienda t = tiendaRepo.findById(tiendaId).orElseThrow();
+
+        if (!br.hasErrors() && !(form.isAceptaTarjeta() || form.isAceptaEfectivo() || form.isAceptaFiado())) {
+            br.reject("pagos", "Deja activa al menos una forma de pago.");
+        }
+        if (br.hasErrors()) {
+            model.addAttribute("tienda", t);
+            model.addAttribute("tiendaId", tiendaId);
+            return "config_tienda";
+        }
+
+        // 1) Datos visibles de la tienda
+        String nuevoNombre = form.getNombre().trim();
+        if (!nuevoNombre.equals(t.getNombre())) {
+            t.setNombre(nuevoNombre);
+            t.setSlug(TiendaService.slug(nuevoNombre));
+        }
+        t.setDescripcion(ConfigTiendaForm.limpio(form.getDescripcion()));
+        t.setCategoria(ConfigTiendaForm.limpio(form.getCategoria()));
+        t.setCiudad(ConfigTiendaForm.limpio(form.getCiudad()));
+        t.setGoogleMapsUrl(ConfigTiendaForm.limpio(form.getGoogleMapsUrl()));
+        t.setActiva(form.isActiva());
+        tiendaRepo.save(t);
+
+        // 2) Configuración propia de la tienda
+        ConfiguracionTienda c = configService.obtenerOCrear(tiendaId);
+        form.aplicarA(c);
+        configService.guardar(c);
+
+        ra.addFlashAttribute("mensajeExito", "Configuración de la tienda guardada.");
+        return "redirect:/config/tienda?tiendaId=" + tiendaId;
     }
 }

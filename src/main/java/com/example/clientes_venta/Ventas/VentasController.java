@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.clientes_venta.Compra.Compra;
-import com.example.clientes_venta.Tienda.EstadoMembresia;
-import com.example.clientes_venta.Tienda.RolTienda;
+import com.example.clientes_venta.Configuracion.ConfiguracionTiendaService;
 import com.example.clientes_venta.Tienda.Tienda;
 import com.example.clientes_venta.Tienda.TiendaRepository;
 import com.example.clientes_venta.Tienda.TiendaService;
@@ -29,19 +28,22 @@ public class VentasController {
     private final TiendaRepository tiendaRepo;
     private final TiendaService tiendaService;
     private final TiendaUsuarioRepository tiendaUsuarioRepo;
+    private final ConfiguracionTiendaService configService;
 
     public VentasController(
             VentasService ventasService,
             UsuarioRepo usuarioRepo,
             TiendaRepository tiendaRepo,
             TiendaService tiendaService,
-            TiendaUsuarioRepository tiendaUsuarioRepo
+            TiendaUsuarioRepository tiendaUsuarioRepo,
+            ConfiguracionTiendaService configService
     ) {
         this.ventasService = ventasService;
         this.usuarioRepo = usuarioRepo;
         this.tiendaRepo = tiendaRepo;
         this.tiendaService = tiendaService;
         this.tiendaUsuarioRepo = tiendaUsuarioRepo;
+        this.configService = configService;
     }
 
     private Usuario getUsuario(Authentication auth) {
@@ -122,63 +124,64 @@ public class VentasController {
         return "ventas";
     }
 
-    @PostMapping("/{id}/aprobar")
-    public String aprobar(
-            @PathVariable Long id,
-            @RequestParam Long tiendaId,
-            Authentication auth,
-            RedirectAttributes ra
-    ) {
+    // ===================== Acciones sobre un pedido =====================
+    // Todas: validan admin de la tienda, llaman al servicio y muestran el error si algo no se puede.
+
+    private interface Accion { void run(Usuario admin); }
+
+    private String ejecutar(Long tiendaId, String volverA, Authentication auth, RedirectAttributes ra,
+                            String exito, Accion accion) {
         Usuario admin = getUsuario(auth);
         if (admin == null) return "redirect:/login";
-
         if (!tiendaService.esAdminDeTienda(admin, tiendaId)) {
-            ra.addFlashAttribute("mensajeError", "No tienes permisos para aprobar ventas de esta tienda.");
-            return "redirect:/ventas?tiendaId=" + tiendaId;
+            ra.addFlashAttribute("mensajeError", "No tienes permisos sobre las ventas de esta tienda.");
+            return "redirect:/home";
         }
+        try {
+            accion.run(admin);
+            ra.addFlashAttribute("mensajeExito", exito);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            ra.addFlashAttribute("mensajeError", e.getMessage());
+        }
+        return "redirect:" + volverA + "?tiendaId=" + tiendaId;
+    }
 
-        ventasService.aprobarVenta(id);
-        return "redirect:/ventas?tiendaId=" + tiendaId;
+    @PostMapping("/{id}/aprobar")
+    public String aprobar(@PathVariable Long id, @RequestParam Long tiendaId,
+                          Authentication auth, RedirectAttributes ra) {
+        return ejecutar(tiendaId, "/ventas", auth, ra, "Pedido #" + id + " confirmado.",
+                admin -> ventasService.aprobarVenta(id, tiendaId, admin));
     }
 
     @PostMapping("/{id}/cancelar")
-    public String cancelar(
-            @PathVariable Long id,
-            @RequestParam Long tiendaId,
-            @RequestParam(required = false) String motivo,
-            Authentication auth,
-            RedirectAttributes ra
-    ) {
-        Usuario admin = getUsuario(auth);
-        if (admin == null) return "redirect:/login";
+    public String cancelar(@PathVariable Long id, @RequestParam Long tiendaId,
+                           @RequestParam(required = false) String motivo,
+                           Authentication auth, RedirectAttributes ra) {
+        return ejecutar(tiendaId, "/ventas", auth, ra, "Pedido #" + id + " cancelado.",
+                admin -> ventasService.cancelarVenta(id, tiendaId, motivo));
+    }
 
-        if (!tiendaService.esAdminDeTienda(admin, tiendaId)) {
-            ra.addFlashAttribute("mensajeError", "No tienes permisos para cancelar ventas de esta tienda.");
-            return "redirect:/ventas?tiendaId=" + tiendaId;
-        }
+    @PostMapping("/{id}/reembolsar")
+    public String reembolsar(@PathVariable Long id, @RequestParam Long tiendaId,
+                             @RequestParam(required = false) String motivo,
+                             Authentication auth, RedirectAttributes ra) {
+        return ejecutar(tiendaId, "/ventas/historial", auth, ra, "Pedido #" + id + " reembolsado.",
+                admin -> ventasService.reembolsarVenta(id, tiendaId, motivo, admin));
+    }
 
-        ventasService.cancelarVenta(id, motivo);
-        return "redirect:/ventas?tiendaId=" + tiendaId;
+    @PostMapping("/{id}/cobrado")
+    public String cobrado(@PathVariable Long id, @RequestParam Long tiendaId,
+                          Authentication auth, RedirectAttributes ra) {
+        return ejecutar(tiendaId, "/ventas/historial", auth, ra, "Cobro en efectivo registrado.",
+                admin -> ventasService.marcarCobrado(id, tiendaId));
     }
 
     @PostMapping("/{ventaId}/items/{itemId}/eliminar")
-    public String eliminarItem(
-            @PathVariable Long ventaId,
-            @PathVariable Long itemId,
-            @RequestParam Long tiendaId,
-            Authentication auth,
-            RedirectAttributes ra
-    ) {
-        Usuario admin = getUsuario(auth);
-        if (admin == null) return "redirect:/login";
-
-        if (!tiendaService.esAdminDeTienda(admin, tiendaId)) {
-            ra.addFlashAttribute("mensajeError", "No tienes permisos para editar ventas de esta tienda.");
-            return "redirect:/ventas?tiendaId=" + tiendaId;
-        }
-
-        ventasService.eliminarItem(ventaId, itemId, auth.getName());
-        return "redirect:/ventas?tiendaId=" + tiendaId;
+    public String eliminarItem(@PathVariable Long ventaId, @PathVariable Long itemId,
+                               @RequestParam Long tiendaId,
+                               Authentication auth, RedirectAttributes ra) {
+        return ejecutar(tiendaId, "/ventas", auth, ra, "Producto quitado del pedido.",
+                admin -> ventasService.eliminarItem(ventaId, itemId, tiendaId));
     }
 
     @GetMapping("/historial")
@@ -210,6 +213,7 @@ public class VentasController {
         model.addAttribute("tiendaId", resolvedId);
         model.addAttribute("ventas", ventas);
         model.addAttribute("paginaActual", "ventas");
+        model.addAttribute("permiteReembolsos", configService.de(resolvedId).isPermiteReembolsos());
 
         return "ventas_historial";
     }

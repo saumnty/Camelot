@@ -2,11 +2,16 @@ package com.example.clientes_venta.Clientes;
 
 import java.math.BigDecimal;
 
+import com.example.clientes_venta.Tienda.Tienda;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -32,6 +37,15 @@ public class Cliente {
 
     @Column(length = 255)
     private String deudaNota;
+
+    // Cada tienda tiene su propia libreta. Antes la tabla era global y todos veían
+    // los clientes de todos. Las filas viejas sin tienda ya no se muestran.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tienda_id")
+    private Tienda tienda;
+
+    public Tienda getTienda() { return tienda; }
+    public void setTienda(Tienda tienda) { this.tienda = tienda; }
 
     // ===== Constructores =====
     public Cliente() {}

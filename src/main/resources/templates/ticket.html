@@ -313,10 +313,20 @@
         <!-- Encabezado -->
         <div class="brand">
           <div class="name" th:text="${compra.tienda.nombre} ?: 'Camelot'">Camelot</div>
+          <div class="meta" th:if="${config != null}">
+            <div th:if="${config.razonSocial != null}" th:text="${config.razonSocial}">Razón social</div>
+            <div th:if="${config.rfc != null}" th:text="'RFC: ' + ${config.rfc}">RFC</div>
+            <div th:if="${config.direccion != null}" th:text="${config.direccion}">Dirección</div>
+            <div th:if="${config.telefono != null}" th:text="'Tel. ' + ${config.telefono}">Tel</div>
+          </div>
           <div class="meta">
             <div th:text="'Ticket #' + ${compra.id}">Ticket #123</div>
             <div th:text="${#temporals.format(compra.fecha,'yyyy-MM-dd HH:mm')}">2025-12-19 22:03</div>
             <div th:text="'Estado: ' + ${compra.estado}">Estado: PENDIENTE</div>
+            <div th:if="${compra.metodoPago != null}"
+                 th:text="'Pago: ' + ${compra.metodoPago.etiqueta()} + ' (' + ${compra.estadoPago.etiqueta()} + ')'">Pago</div>
+            <div th:if="${pagoTarjeta != null}"
+                 th:text="${pagoTarjeta.marcaTarjeta} + ' •••• ' + ${pagoTarjeta.ultimos4}">Visa •••• 4242</div>
           </div>
         </div>
 
@@ -345,18 +355,18 @@
             <div class="qty" th:text="${it.cantidad}">1</div>
             <div class="sub">
               <!-- subtotal = precioUnitario * cantidad -->
-              <span th:text="${#numbers.formatDecimal(it.precioUnitario * it.cantidad, 1, 'POINT', 2, 'POINT')}">0.00</span>
+              <span th:text="${#numbers.formatDecimal(it.precioUnitario * it.cantidad, 1, 'COMMA', 2, 'POINT')}">0.00</span>
               <br/>
-              <small th:text="'$' + ${#numbers.formatDecimal(it.precioUnitario,1,'POINT',2,'POINT')} + ' c/u'">$0.00 c/u</small>
+              <small th:text="'$' + ${#numbers.formatDecimal(it.precioUnitario,1,'COMMA',2,'POINT')} + ' c/u'">$0.00 c/u</small>
             </div>
           </div>
         </div>
 
-        <div th:if="${compra.estado.name() == 'CANCELADA' 
+        <div th:if="${(compra.estado.name() == 'CANCELADA' or compra.estado.name() == 'REEMBOLSADA')
                   && compra.motivo != null 
                   && !#strings.isEmpty(compra.motivo)}"
             class="motivo-box">
-          <strong>Motivo de cancelación:</strong><br/>
+          <strong th:text="${compra.estado.name() == 'REEMBOLSADA' ? 'Motivo del reembolso:' : 'Motivo de cancelación:'}">Motivo de cancelación:</strong><br/>
           <span th:text="${compra.motivo}"></span>
         </div>
 
@@ -364,16 +374,24 @@
 
         <!-- Totales -->
         <div class="totals">
+          <div class="row" th:if="${compra.impuestos != null}">
+            <div>Subtotal</div>
+            <div class="v">$<span th:text="${#numbers.formatDecimal(compra.subtotal, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+          </div>
+          <div class="row" th:if="${compra.impuestos != null}">
+            <div th:text="${'IVA ' + (config != null ? #numbers.formatDecimal(config.iva, 1, 0) + '%' : '')}">IVA</div>
+            <div class="v">$<span th:text="${#numbers.formatDecimal(compra.impuestos, 1, 'COMMA', 2, 'POINT')}">0.00</span></div>
+          </div>
           <div class="row grand">
             <div>TOTAL</div>
             <div class="v">
-              $<span th:text="${#numbers.formatDecimal(compra.total, 1, 'POINT', 2, 'POINT')}">0.00</span>
+              $<span th:text="${#numbers.formatDecimal(compra.total, 1, 'COMMA', 2, 'POINT')}">0.00</span>
             </div>
           </div>
         </div>
 
         <div class="footer">
-          <div>Gracias por tu compra.</div>
+          <div th:text="${config != null and config.mensajeTicket != null ? config.mensajeTicket : 'Gracias por tu compra.'}">Gracias por tu compra.</div>
           <div th:if="${compra.estado?.name() == 'PENDIENTE'}">
             Esta compra está <b>PENDIENTE</b> de validación por la tienda.
           </div>

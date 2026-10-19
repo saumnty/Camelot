@@ -50,7 +50,22 @@ public class TiendaService {
             tienda.setTipo(TipoTienda.NORMAL);
         }
 
-        return tiendaRepository.save(tienda);
+        boolean esNueva = tienda.getId() == null;
+        Tienda guardada = tiendaRepository.save(tienda);
+
+        // Quien crea la tienda queda como ADMIN de ella (antes nadie quedaba como admin
+        // y la tienda dependía de una solicitud "soy dueño" que nadie podía aprobar).
+        Usuario owner = guardada.getOwner();
+        if (esNueva && owner != null && owner.getId() != null
+                && tiendaUsuarioRepo.findByTienda_IdAndUsuario_Id(guardada.getId(), owner.getId()).isEmpty()) {
+            TiendaUsuario tu = new TiendaUsuario();
+            tu.setTienda(guardada);
+            tu.setUsuario(owner);
+            tu.setRol(RolTienda.ADMIN);
+            tu.setEstado(EstadoMembresia.ACTIVO);
+            tiendaUsuarioRepo.save(tu);
+        }
+        return guardada;
     }
 
     /**
@@ -145,6 +160,15 @@ public class TiendaService {
         if (filas == 0) {
             throw new IllegalArgumentException("Tienda no encontrada: " + tiendaId);
         }
+    }
+
+    /** "Abarrotes Doña Mary" → "abarrotes-do-a-mary" (misma regla que al crear la tienda). */
+    public static String slug(String nombre) {
+        return nombre == null ? "" : nombre
+                .toLowerCase()
+                .trim()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-|-$)", "");
     }
 
     public String obtenerNombreTienda(Long tiendaId) {
