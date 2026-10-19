@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.clientes_venta.Tienda.EstadoMembresia;
 import com.example.clientes_venta.Tienda.RolTienda;
+import com.example.clientes_venta.Tienda.TiendaContexto;
 import com.example.clientes_venta.Tienda.TiendaUsuarioRepository;
 import com.example.clientes_venta.Usuario.UsuarioRepo;
 
@@ -37,13 +38,13 @@ public class CamaraController {
     ) {
 
         // 1) Resolver tienda activa (URL -> sesión)
-        if (tiendaId != null) session.setAttribute("tiendaId", tiendaId);
+        if (tiendaId != null) session.setAttribute(TiendaContexto.SESION_TIENDA_ADMIN, tiendaId);
 
-        Object tidObj = session.getAttribute("tiendaId");
+        Object tidObj = session.getAttribute(TiendaContexto.SESION_TIENDA_ADMIN);
         Long tiendaIdResuelta = (tidObj == null) ? null : Long.valueOf(tidObj.toString());
 
         if (tiendaIdResuelta == null) {
-            model.addAttribute("mensajeError", "No hay tienda activa. Entra a /tiendas/{id} y luego a Cámaras.");
+            model.addAttribute("mensajeError", "No administras ninguna tienda.");
             return "camaras";
         }
 
@@ -99,7 +100,7 @@ public class CamaraController {
         Long tiendaId = getTiendaIdFromSession(session);
         if (tiendaId == null) return "redirect:/camaras";
 
-        if (!esAdmin(auth, tiendaId)) {
+        if (!esAdmin(auth, tiendaId) || !esDeLaTienda(id, tiendaId)) {
             ra.addFlashAttribute("mensajeError", "No tienes permisos.");
             return "redirect:/camaras?tiendaId=" + tiendaId;
         }
@@ -114,7 +115,7 @@ public class CamaraController {
         Long tiendaId = getTiendaIdFromSession(session);
         if (tiendaId == null) return "redirect:/camaras";
 
-        if (!esAdmin(auth, tiendaId)) {
+        if (!esAdmin(auth, tiendaId) || !esDeLaTienda(id, tiendaId)) {
             ra.addFlashAttribute("mensajeError", "No tienes permisos.");
             return "redirect:/camaras?tiendaId=" + tiendaId;
         }
@@ -129,7 +130,7 @@ public class CamaraController {
         Long tiendaId = getTiendaIdFromSession(session);
         if (tiendaId == null) return "redirect:/camaras";
 
-        if (!esAdmin(auth, tiendaId)) {
+        if (!esAdmin(auth, tiendaId) || !esDeLaTienda(id, tiendaId)) {
             ra.addFlashAttribute("mensajeError", "No tienes permisos.");
             return "redirect:/camaras?tiendaId=" + tiendaId;
         }
@@ -142,8 +143,18 @@ public class CamaraController {
         return "redirect:/camaras?tiendaId=" + tiendaId;
     }
 
+    /** La cámara debe ser de la tienda que administras (antes bastaba con conocer su id). */
+    private boolean esDeLaTienda(Long camaraId, Long tiendaId) {
+        try {
+            Camara c = camaraService.obtener(camaraId);
+            return c != null && c.getTienda() != null && c.getTienda().getId().equals(tiendaId);
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
     private Long getTiendaIdFromSession(HttpSession session) {
-        Object tidObj = session.getAttribute("tiendaId");
+        Object tidObj = session.getAttribute(TiendaContexto.SESION_TIENDA_ADMIN);
         return (tidObj == null) ? null : Long.valueOf(tidObj.toString());
     }
 
@@ -162,7 +173,11 @@ public class CamaraController {
     }
 
     @GetMapping("/camaras/nueva")
-    public String nuevaCamara(@RequestParam Long tiendaId, Model model) {
+    public String nuevaCamara(@RequestParam Long tiendaId, Model model, Authentication auth, RedirectAttributes ra) {
+        if (!esAdmin(auth, tiendaId)) {
+            ra.addFlashAttribute("mensajeError", "No tienes permisos.");
+            return "redirect:/home";
+        }
         model.addAttribute("tiendaId", tiendaId);
         model.addAttribute("camaraForm", new Camara());
         return "camaras_nueva";
