@@ -123,8 +123,9 @@ Load ~75 typical Mexican grocery products into an existing store (id 5 here):
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="--camelot.semilla.tienda-id=5"
 ```
 
-For real products (names, brands, photos) from Open Food Facts, run
-`python3 scripts/openfoodfacts_a_csv.py` and pass `--camelot.semilla.archivo=file:productos_off.csv`.
+For real products (names, brands, barcodes, photos) from Open Food Facts, run
+`python scripts/openfoodfacts_a_csv.py --cuantos 1000` on your computer and upload the generated
+`productos_off_*.csv` in **Importar (Excel / CSV)**. Prices are category references: review them.
 
 ### Payments (simulated)
 `camelot.pagos.proveedor=simulado` — no real money moves. Test cards:
