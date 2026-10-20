@@ -27,16 +27,16 @@
             <section class="welcome-section">
                 <div class="top-row">
                 <div class="welcome-header">
-                    <h1>Mis ventas</h1>
+                    <h1>Pedidos por revisar</h1>
                     <p class="welcome-subtitle">
                     <span th:text="${tienda != null ? tienda.nombre : 'Tienda'}">Tienda</span>
-                    · Compras de clientes por validar / historial
+                    · Acepta o rechaza los pedidos nuevos. Los ya resueltos están en el historial.
                     </p>
                 </div>
 
                 <div class="actions-row">
                     <a class="btn-secondary" th:href="@{/ventas/historial(tiendaId=${tiendaId})}">
-                        <i class="fas fa-clock-rotate-left"></i> Registro
+                        <i class="fas fa-clock-rotate-left"></i> Historial de ventas
                     </a>
 
                     <div class="buscador">
@@ -86,7 +86,7 @@
                 <!-- Filas -->
                 <div th:if="${#lists.isEmpty(ventas)}" class="compras-row compras-row-empty">
                     <div class="compras-col" style="grid-column: 1 / -1; opacity:.7;">
-                    ✅ No hay ventas registradas.
+                    ✅ No tienes pedidos por revisar. Las ventas confirmadas están en el <a th:href="@{/ventas/historial(tiendaId=${tiendaId})}" style="text-decoration:underline;">historial de ventas</a>.
                     </div>
                 </div>
 
