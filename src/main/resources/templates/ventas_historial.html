@@ -25,7 +25,7 @@
     <section class="welcome-section">
       <div class="top-row">
         <div class="welcome-header">
-          <h1>Registro de ventas</h1>
+          <h1>Historial de ventas</h1>
           <p class="welcome-subtitle">Historial (solo lectura): fecha, cliente, total, estado y detalle</p>
         </div>
 
@@ -63,7 +63,7 @@
         <!-- Empty -->
         <div th:if="${#lists.isEmpty(ventas)}" class="compras-row compras-row-empty">
           <div class="compras-col" style="grid-column: 1 / -1; opacity:.7;">
-            ✅ No hay ventas registradas.
+            Todavía no hay ventas.
           </div>
         </div>
 
