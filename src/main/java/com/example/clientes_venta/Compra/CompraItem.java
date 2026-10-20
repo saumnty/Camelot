@@ -7,7 +7,11 @@ import com.example.clientes_venta.Producto.Producto;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+// @Getter/@Setter en vez de @Data: @Data genera toString/equals/hashCode que recorren
+// Compra.items → CompraItem.compra → Compra.items... sin fin (StackOverflowError).
+// En entidades JPA es mejor no generar esos métodos.
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
