@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
@@ -34,6 +37,7 @@ import com.example.clientes_venta.Pago.EstadoPago;
 import com.example.clientes_venta.Pago.MetodoPago;
 import com.example.clientes_venta.Producto.Producto;
 import com.example.clientes_venta.Producto.ProductoRepository;
+import com.example.clientes_venta.Producto.importar.ImportacionProductosService;
 import com.example.clientes_venta.Tienda.Tienda;
 import com.example.clientes_venta.Tienda.TiendaService;
 import com.example.clientes_venta.Tienda.TipoTienda;
@@ -298,5 +302,51 @@ class FlujosPrincipalesTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("password"))));
         assertThat(usuarioRepo.findByEmail(email).orElseThrow().getRol()).isEqualTo(Rol.USER);
+    }
+
+    // ------------------------------------------------------------------ importar productos
+
+    @Test
+    void importarCsvConVistaPreviaYConfirmar() throws Exception {
+        String csv = "codigo_barras,nombre,precio,stock,categoria\n"
+                + ",Refresco 600ml,22.50,8,Bebidas\n"            // existe → se actualiza
+                + "7501000111206,Gansito,19,30,Pan\n"            // nuevo
+                + ",Sin precio,,5,\n";                            // error
+        MockMultipartFile archivo = new MockMultipartFile("archivo", "productos.csv", "text/csv",
+                csv.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        MockHttpSession sesion = new MockHttpSession();
+
+        // Plantilla y formulario
+        mvc.perform(get("/productos/importar/plantilla.csv").with(como(dueno))).andExpect(status().isOk());
+        mvc.perform(get("/productos/importar?tiendaId=" + tienda.getId()).with(como(dueno))).andExpect(status().isOk());
+
+        // Vista previa: no guarda nada todavía
+        mvc.perform(multipart("/productos/importar").file(archivo).session(sesion).with(como(dueno)).with(csrf())
+                        .param("tiendaId", tienda.getId().toString()).param("actualizar", "true"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Gansito")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Falta el precio")));
+        assertThat(productoRepo.findByTienda_Id(tienda.getId())).hasSize(1);
+
+        // Confirmar
+        mvc.perform(post("/productos/importar/confirmar").session(sesion).with(como(dueno)).with(csrf())
+                        .param("tiendaId", tienda.getId().toString()))
+                .andExpect(redirectedUrl("/productos?tiendaId=" + tienda.getId()));
+
+        var productos = productoRepo.findByTienda_Id(tienda.getId());
+        assertThat(productos).hasSize(2);
+        assertThat(productoRepo.findById(refresco.getId()).orElseThrow().getPrecio()).isEqualByComparingTo("22.50");
+        assertThat(productos.stream().filter(p -> "7501000111206".equals(p.getCodigoBarras())).findFirst()).isPresent();
+    }
+
+    @Test
+    void clienteNoPuedeImportarNiUsarLaApiDeCodigos() throws Exception {
+        mvc.perform(get("/productos/importar?tiendaId=" + tienda.getId()).with(como(cliente)))
+                .andExpect(redirectedUrl("/home"));
+        mvc.perform(get("/api/productos/codigo/7501055300075").with(como(cliente)))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/productos/codigo/123").with(como(dueno)))
+                .andExpect(status().isBadRequest());
+        assertThat(ImportacionProductosService.plantillaCsv()).contains("codigo_barras,nombre,precio");
     }
 }

@@ -108,6 +108,14 @@ Hibernate (`ddl-auto=update`) creates new tables/columns on startup. Data fixes 
 `db/migraciones/`: run `01_antes_de_desplegar.sql` **before** deploying and
 `02_despues_de_desplegar.sql` **after** the first deploy (Supabase → SQL Editor).
 
+### Bulk product import & barcodes
+- **Catálogo y precios → Importar (Excel / CSV)**: upload `.xlsx` or `.csv`, review a preview
+  (new / updated / errors) and confirm. Common column names are recognized
+  ("Descripción", "Precio venta", "Existencia", "EAN"…). Template at `/productos/importar/plantilla.csv`.
+- Rows with a barcode but no name/photo are completed from Open Food Facts.
+- The product form has a barcode field: USB/Bluetooth scanners, camera scanning (Chrome Android)
+  and autofill. Requires `db/migraciones/03_codigo_de_barras.sql`.
+
 ### Demo catalog
 Load ~75 typical Mexican grocery products into an existing store (id 5 here):
 

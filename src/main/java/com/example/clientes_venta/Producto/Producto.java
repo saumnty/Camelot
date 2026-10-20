@@ -11,13 +11,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Index;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "producto")
+@Table(name = "producto",
+       indexes = @Index(name = "idx_producto_tienda_codigo", columnList = "tienda_id, codigo_barras"))
 public class Producto {
 
     @Id
@@ -57,6 +59,16 @@ public class Producto {
 
     @Column(nullable = false)
     private boolean destacado = false;
+
+    // Código de barras (EAN-13 / UPC). Sirve para importar y autollenar desde Open Food Facts.
+    @Column(name = "codigo_barras", length = 32)
+    private String codigoBarras;
+
+    public String getCodigoBarras() { return codigoBarras; }
+    public void setCodigoBarras(String codigoBarras) {
+        String limpio = codigoBarras == null ? null : codigoBarras.replaceAll("\\D", "");
+        this.codigoBarras = (limpio == null || limpio.isEmpty()) ? null : limpio;
+    }
 
     public boolean isDestacado() { return destacado; }
     public void setDestacado(boolean destacado) { this.destacado = destacado; }

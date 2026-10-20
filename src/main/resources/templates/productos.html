@@ -56,6 +56,12 @@
                         class="btn-primary">
                         Agregar producto
                     </a>
+                    <a th:if="${puedeGestionarProductos and tiendaId != null}"
+                        th:href="@{/productos/importar(tiendaId=${tiendaId})}"
+                        class="btn-secondary">
+                        <i class="fas fa-file-import"></i>
+                        Importar (Excel / CSV)
+                    </a>
 
 
                     <a sec:authorize="hasRole('USER')"
