@@ -19,6 +19,9 @@ public interface CompraRepository extends JpaRepository<Compra, Long> {
 
     List<Compra> findByTienda_IdAndEstadoOrderByFechaDesc(Long tiendaId, EstadoCompra estado);
 
+    // Buzón: pedidos pendientes de todas mis tiendas
+    List<Compra> findByTienda_IdInAndEstadoOrderByFechaDesc(java.util.Collection<Long> tiendaIds, EstadoCompra estado);
+
     // ==========================
     // 5A / 5B: Reportes de ventas
     // ==========================

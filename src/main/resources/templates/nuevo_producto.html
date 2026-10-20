@@ -43,6 +43,26 @@
             <input type="hidden" name="tiendaId"
                 th:value="${tiendaId != null ? tiendaId : (tienda != null ? tienda.id : null)}">
 
+            <!-- Código de barras: busca nombre, foto y contenido automáticamente -->
+            <div class="codigo-barras-box">
+                <label for="codigoBarras"><i class="fas fa-barcode"></i> Código de barras (opcional)</label>
+                <div class="codigo-barras-fila">
+                    <input type="text" id="codigoBarras" th:field="*{codigoBarras}" inputmode="numeric"
+                           autocomplete="off" placeholder="Escanéalo o escríbelo: 7501055300075">
+                    <button type="button" class="btn-sm btn-ok" id="btnBuscarCodigo">
+                        <i class="fas fa-magnifying-glass"></i> <span>Buscar</span>
+                    </button>
+                    <button type="button" class="btn-sm btn-ghost" id="btnEscanear" hidden>
+                        <i class="fas fa-camera"></i> <span>Escanear</span>
+                    </button>
+                </div>
+                <small id="codigoEstado">Con lector de códigos: escanea y se llena solo. Luego solo pon precio y stock.</small>
+                <div id="escanerBox" class="escaner-box" hidden>
+                    <video id="escanerVideo" playsinline muted></video>
+                    <button type="button" class="btn-sm btn-danger" id="btnCerrarEscaner"><i class="fas fa-xmark"></i> Cerrar cámara</button>
+                </div>
+            </div>
+
             <div class="form-grid">
 
                 <!-- Nombre -->
@@ -190,7 +210,7 @@
                         th:text="${esEdicion} ? 'Guardar cambios' : 'Crear producto'">
                     Crear producto
                 </button>
-                <a href="/productos" class="btn-secondary-link">
+                <a th:href="@{/productos(tiendaId=${tiendaId})}" class="btn-secondary-link">
                     Cancelar
                 </a>
             </div>
@@ -201,6 +221,107 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ---------- CÓDIGO DE BARRAS → AUTOLLENADO ----------
+    (function () {
+        const input = document.getElementById('codigoBarras');
+        const btn = document.getElementById('btnBuscarCodigo');
+        const estado = document.getElementById('codigoEstado');
+        if (!input || !btn) return;
+
+        function avisar(texto, tipo) {
+            estado.textContent = texto;
+            estado.className = tipo ? 'estado-' + tipo : '';
+        }
+
+        function poner(id, valor, soloSiVacio) {
+            const el = document.getElementById(id);
+            if (!el || valor === null || valor === undefined || valor === '') return;
+            if (soloSiVacio && el.value && el.value.trim()) return;
+            el.value = valor;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        async function buscar() {
+            const codigo = (input.value || '').replace(/\D/g, '');
+            if (!/^(\d{8}|\d{12,14})$/.test(codigo)) {
+                avisar('El código debe tener 8, 12, 13 o 14 dígitos.', 'error');
+                return;
+            }
+            btn.disabled = true;
+            avisar('Buscando…');
+            try {
+                const r = await fetch('/api/productos/codigo/' + codigo, { headers: { 'Accept': 'application/json' } });
+                const datos = await r.json().catch(() => ({}));
+                if (!r.ok) { avisar(datos.mensaje || 'No lo encontré. Llena los datos a mano.', 'error'); return; }
+                // Si ya escribiste algo, no lo pisa
+                poner('name', datos.nombre, true);
+                poner('imagenUrl', datos.imagenUrl, true);
+                poner('unidadMedida', datos.unidad, true);
+                poner('cantidadMedida', datos.cantidad, true);
+                avisar('✓ Encontrado' + (datos.fuente === 'openfoodfacts' ? ' en Open Food Facts' : ' en Camelot')
+                       + '. Revisa el nombre y pon precio y stock.', 'ok');
+                const precio = document.getElementById('precio');
+                if (precio && !precio.value) precio.focus();
+            } catch (e) {
+                avisar('No pude buscar ahora. Llena los datos a mano.', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        btn.addEventListener('click', buscar);
+        // Los lectores USB/Bluetooth "teclean" el código y Enter: buscamos en vez de enviar el formulario
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); buscar(); }
+        });
+
+        // Escanear con la cámara (Chrome en Android y algunos navegadores de escritorio)
+        const btnEsc = document.getElementById('btnEscanear');
+        const box = document.getElementById('escanerBox');
+        const video = document.getElementById('escanerVideo');
+        let stream = null, activo = false;
+        if (!('BarcodeDetector' in window) || !navigator.mediaDevices) return;
+        btnEsc.hidden = false;
+
+        async function cerrar() {
+            activo = false;
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            stream = null;
+            box.hidden = true;
+        }
+        document.getElementById('btnCerrarEscaner').addEventListener('click', cerrar);
+
+        btnEsc.addEventListener('click', async () => {
+            try {
+                const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = stream;
+                await video.play();
+                box.hidden = false;
+                activo = true;
+                avisar('Apunta la cámara al código de barras…');
+                const leer = async () => {
+                    if (!activo) return;
+                    try {
+                        const codigos = await detector.detect(video);
+                        if (codigos.length) {
+                            input.value = codigos[0].rawValue;
+                            await cerrar();
+                            buscar();
+                            return;
+                        }
+                    } catch (e) { /* cuadro sin código */ }
+                    requestAnimationFrame(leer);
+                };
+                leer();
+            } catch (e) {
+                await cerrar();
+                avisar('No pude abrir la cámara (¿diste permiso?). Escribe el código.', 'error');
+            }
+        });
+    })();
 
     // ---------- PREVISUALIZACIÓN DE IMAGEN ----------
     const imagenInput = document.getElementById('imagenUrl');

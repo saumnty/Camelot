@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/sidebar :: head('Importar productos')}"></head>
+<body>
+<div class="app-container">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="main-content">
+        <div class="page-wrap">
+            <a class="btn-sm btn-ghost" th:href="@{/productos(tiendaId=${tiendaId})}" style="margin-bottom:12px;">
+                <i class="fas fa-arrow-left"></i> Catálogo
+            </a>
+            <h1 class="page-title">Importar productos</h1>
+            <p class="page-subtitle">Carga muchos productos de una vez en <b th:text="${tienda.nombre}">tu tienda</b>
+                desde Excel o CSV. Primero ves una vista previa; nada se guarda hasta que confirmes.</p>
+
+            <th:block th:replace="~{fragments/sidebar :: flash}"></th:block>
+
+            <!-- ======================= 1) SUBIR ======================= -->
+            <th:block th:if="${vista == null}">
+                <section class="panel">
+                    <h2><i class="fas fa-list-ol"></i> Cómo funciona</h2>
+                    <ol class="pasos">
+                        <li><a th:href="@{/productos/importar/plantilla.csv}" download><b>Descarga la plantilla</b></a>
+                            o usa el Excel que ya tengas (la primera fila deben ser los nombres de las columnas).</li>
+                        <li>Llena una fila por producto. Solo <b>nombre</b> y <b>precio</b> son obligatorios.</li>
+                        <li>Si pones el <b>código de barras</b>, puedes dejar el nombre o la foto vacíos:
+                            Camelot los busca en <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>.</li>
+                        <li>Sube el archivo, revisa la vista previa y confirma.</li>
+                    </ol>
+                    <details class="detalle-columnas">
+                        <summary>Columnas que reconoce</summary>
+                        <div class="tabla-wrap">
+                            <table class="tabla">
+                                <tr><th>Columna</th><th>También acepta</th><th>Ejemplo</th></tr>
+                                <tr><td><b>codigo_barras</b></td><td>código, EAN, UPC, SKU</td><td>7501055300075</td></tr>
+                                <tr><td><b>nombre</b></td><td>producto, descripción, artículo</td><td>Coca-Cola 600 ml</td></tr>
+                                <tr><td><b>precio</b></td><td>precio venta, precio público</td><td>20.00 · $20 · 20,00</td></tr>
+                                <tr><td>costo</td><td>costo proveedor, precio compra</td><td>15.50</td></tr>
+                                <tr><td>stock</td><td>existencia, inventario</td><td>48 (vacío = no lo cuento)</td></tr>
+                                <tr><td>categoria</td><td>departamento, familia</td><td>Bebidas</td></tr>
+                                <tr><td>subcategoria</td><td>línea, marca</td><td>Refrescos</td></tr>
+                                <tr><td>unidad</td><td>unidad de medida, UM</td><td>pieza · l · ml · kg · g</td></tr>
+                                <tr><td>cantidad</td><td>contenido, presentación</td><td>600 · "600 ml"</td></tr>
+                                <tr><td>imagen_url</td><td>foto, imagen</td><td>https://…</td></tr>
+                            </table>
+                        </div>
+                        <p class="item-meta" style="margin-top:8px;">
+                            Si un producto ya existe (mismo código o mismo nombre), se actualizan solo las columnas que traiga el archivo.
+                        </p>
+                    </details>
+                </section>
+
+                <section class="panel">
+                    <h2><i class="fas fa-file-arrow-up"></i> Subir archivo</h2>
+                    <form th:action="@{/productos/importar(_csrf=${_csrf.token})}" method="post" enctype="multipart/form-data"
+                          id="form-importar">
+                        <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+
+                        <label class="zona-archivo" for="archivo">
+                            <i class="fas fa-file-excel"></i>
+                            <span id="nombre-archivo">Toca para elegir un archivo <b>.xlsx</b> o <b>.csv</b> (máx. 5 MB)</span>
+                            <input type="file" id="archivo" name="archivo" required
+                                   accept=".xlsx,.xls,.csv,.txt,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel">
+                        </label>
+
+                        <div class="campos" style="margin-top:14px;">
+                            <label class="check">
+                                <input type="checkbox" name="completar" value="true" checked>
+                                <span><b>Completar con el código de barras</b>
+                                    <small th:text="'Nombre, foto y contenido de los que falten (hasta ' + ${maxBusquedas} + ' productos por archivo; tarda unos segundos).'">…</small></span>
+                            </label>
+                            <label class="check">
+                                <input type="checkbox" name="actualizar" value="true" checked>
+                                <span><b>Actualizar los que ya existen</b>
+                                    <small>Útil para cambiar precios o stock de muchos productos a la vez.</small></span>
+                            </label>
+                        </div>
+
+                        <div class="form-actions" style="margin-top:16px;">
+                            <button type="submit" class="btn-primary" id="btn-subir">
+                                <i class="fas fa-magnifying-glass"></i> Ver vista previa
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </th:block>
+
+            <!-- ======================= 2) VISTA PREVIA ======================= -->
+            <th:block th:if="${vista != null}">
+                <section class="panel">
+                    <h2><i class="fas fa-eye"></i> Vista previa · <span th:text="${archivo}">archivo.xlsx</span></h2>
+
+                    <div class="flash flash-err" th:each="e : ${vista.errores}" th:text="${e}">error</div>
+
+                    <div class="resumen-import">
+                        <div class="dato dato-ok"><b th:text="${vista.nuevos}">0</b><span>nuevos</span></div>
+                        <div class="dato dato-info"><b th:text="${vista.actualizar}">0</b><span>se actualizan</span></div>
+                        <div class="dato"><b th:text="${vista.sinCambios}">0</b><span>sin cambios</span></div>
+                        <div class="dato dato-err"><b th:text="${vista.conError}">0</b><span>con error</span></div>
+                    </div>
+                    <p class="item-meta" th:if="${vista.completados > 0}">
+                        <i class="fas fa-barcode"></i>
+                        <span th:text="${vista.completados}">0</span> productos se completaron con su código de barras.
+                    </p>
+                    <p class="item-meta" th:if="${vista.faltaronBusquedas}">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        Solo se buscaron los primeros <span th:text="${maxBusquedas}">80</span> códigos.
+                        Sube el resto en otro archivo para completarlos.
+                    </p>
+
+                    <div class="filtros-import" th:unless="${#lists.isEmpty(vista.filas)}">
+                        <button type="button" class="chip activo" data-filtro="todos">Todos</button>
+                        <button type="button" class="chip" data-filtro="ERROR" th:if="${vista.conError > 0}">Con error</button>
+                        <button type="button" class="chip" data-filtro="NUEVO" th:if="${vista.nuevos > 0}">Nuevos</button>
+                        <button type="button" class="chip" data-filtro="ACTUALIZAR" th:if="${vista.actualizar > 0}">Se actualizan</button>
+                    </div>
+
+                    <div class="lista-import">
+                        <div class="fila-import" th:each="f : ${vista.filas}" th:attr="data-accion=${f.accion}"
+                             th:classappend="${'fila-' + #strings.toLowerCase(f.accion)}">
+                            <div class="fila-foto">
+                                <img th:if="${f.imagenUrl != null}" th:src="${f.imagenUrl}" alt="" loading="lazy"
+                                     referrerpolicy="no-referrer">
+                                <i th:unless="${f.imagenUrl != null}" class="fas fa-box"></i>
+                            </div>
+                            <div class="fila-datos">
+                                <div class="fila-titulo">
+                                    <span class="item-meta" th:text="${'Fila ' + f.numero}">Fila 2</span>
+                                    <span class="pill"
+                                          th:classappend="${f.accion.name() == 'NUEVO' ? 'pill-ok' : f.accion.name() == 'ACTUALIZAR' ? 'pill-info' : f.accion.name() == 'ERROR' ? 'pill-err' : 'pill-muted'}"
+                                          th:text="${f.accion.name() == 'NUEVO' ? 'Nuevo' : f.accion.name() == 'ACTUALIZAR' ? 'Se actualiza' : f.accion.name() == 'ERROR' ? 'Error' : 'Sin cambios'}">Nuevo</span>
+                                    <span class="pill pill-muted" th:if="${f.completadoConCodigo}"><i class="fas fa-barcode"></i> completado</span>
+                                </div>
+                                <div class="item-title" th:text="${f.nombre != null ? f.nombre : '(sin nombre)'}">Producto</div>
+                                <div class="item-text fila-meta">
+                                    <span th:if="${f.precio != null}" th:text="${'$' + #numbers.formatDecimal(f.precio, 1, 'COMMA', 2, 'POINT')}">$0</span>
+                                    <span th:if="${f.stock != null}" th:text="${'Stock ' + f.stock}">Stock</span>
+                                    <span th:if="${f.cantidad != null}" th:text="${#numbers.formatDecimal(f.cantidad, 1, 'COMMA', 0, 'POINT') + ' ' + (f.unidad != null ? f.unidad : '')}">600 ml</span>
+                                    <span th:if="${f.categoria != null}" th:text="${f.categoria + (f.subcategoria != null ? ' › ' + f.subcategoria : '')}">Cat</span>
+                                    <span th:if="${f.codigo != null}" class="item-meta" th:text="${f.codigo}">750…</span>
+                                </div>
+                                <div class="fila-error" th:each="e : ${f.errores}"><i class="fas fa-circle-xmark"></i> <span th:text="${e}">error</span></div>
+                                <div class="fila-aviso" th:each="a : ${f.avisos}"><i class="fas fa-circle-info"></i> <span th:text="${a}">aviso</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vacio" th:if="${#lists.isEmpty(vista.filas)}">No hay productos para importar.</div>
+                </section>
+
+                <section class="panel barra-confirmar">
+                    <div>
+                        <b th:text="${vista.nuevos + vista.actualizar} + ' productos se guardarán'">0</b>
+                        <div class="item-meta" th:if="${vista.conError > 0}">
+                            Las filas con error se omiten. Puedes corregirlas en tu archivo y subirlo otra vez.
+                        </div>
+                    </div>
+                    <div class="item-actions">
+                        <form th:action="@{/productos/importar/cancelar}" method="post">
+                            <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+                            <button type="submit" class="btn-sm btn-ghost">Cancelar</button>
+                        </form>
+                        <form th:action="@{/productos/importar/confirmar}" method="post" th:if="${vista.hayAlgoQueGuardar()}">
+                            <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+                            <button type="submit" class="btn-sm btn-ok"><i class="fas fa-check"></i> Confirmar importación</button>
+                        </form>
+                    </div>
+                </section>
+            </th:block>
+        </div>
+    </main>
+</div>
+
+<script>
+    (function () {
+        // Muestra el nombre del archivo elegido y evita doble envío
+        const input = document.getElementById('archivo');
+        if (input) {
+            input.addEventListener('change', () => {
+                const n = input.files && input.files[0] ? input.files[0].name : null;
+                if (n) document.getElementById('nombre-archivo').textContent = n;
+            });
+            document.getElementById('form-importar').addEventListener('submit', () => {
+                const b = document.getElementById('btn-subir');
+                setTimeout(() => { b.disabled = true; b.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Leyendo archivo…'; }, 0);
+            });
+        }
+        // Filtros de la vista previa
+        document.querySelectorAll('.filtros-import .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.filtros-import .chip').forEach(c => c.classList.remove('activo'));
+                chip.classList.add('activo');
+                const f = chip.dataset.filtro;
+                document.querySelectorAll('.fila-import').forEach(row => {
+                    row.style.display = (f === 'todos' || row.dataset.accion === f) ? '' : 'none';
+                });
+            });
+        });
+    })();
+</script>
+</body>
+</html>

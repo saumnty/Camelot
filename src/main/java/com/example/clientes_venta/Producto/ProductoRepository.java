@@ -14,6 +14,10 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     Optional<Producto> findByName(String name);
 
+    // ====== Código de barras / importación ======
+    // Otro producto (de cualquier tienda) con ese código: sirve para autollenar sin ir a internet
+    Optional<Producto> findFirstByCodigoBarrasOrderByIdDesc(String codigoBarras);
+
     List<Producto> findByNameContainingIgnoreCase(String q);
 
     // ====== Catálogo general (como lo tenías) ======

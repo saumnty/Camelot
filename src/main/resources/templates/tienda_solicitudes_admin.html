@@ -1,84 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <title>Solicitudes de dueño</title>
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/sidebar :: head('Solicitudes de dueño')}"></head>
 <body>
+<div class="app-container">
+  <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
-<h2 th:text="'Solicitudes - ' + ${tienda.nombre}">Solicitudes</h2>
+  <main class="main-content">
+    <div class="page-wrap">
+      <h1 class="page-title">Solicitudes de dueño</h1>
+      <p class="page-subtitle" th:text="${tienda.nombre}">Tienda</p>
 
-<div th:if="${msg}">
-  <p th:text="${msg}"></p>
+      <th:block th:replace="~{fragments/sidebar :: flash}"></th:block>
+      <div class="flash flash-info" th:if="${msg != null}" th:text="${msg}">mensaje</div>
+
+      <section class="panel">
+        <h2>Pendientes</h2>
+        <div class="lista">
+          <div class="item" th:each="s : ${pendientes}">
+            <div class="item-icon"><i class="fas fa-user-shield"></i></div>
+            <div class="item-body">
+              <div class="item-title" th:text="${s.solicitante.name}">Nombre</div>
+              <div class="item-text" th:if="${s.nota != null}" th:text="'“' + ${s.nota} + '”'">nota</div>
+              <div class="item-meta" th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</div>
+            </div>
+            <div class="item-actions">
+              <form th:action="@{|/tiendas/${tienda.id}/solicitudes/admin/${s.id}/aprobar|}" method="post">
+                <button class="btn-sm btn-ok" type="submit"><i class="fas fa-check"></i> Aprobar</button>
+              </form>
+              <form th:action="@{|/tiendas/${tienda.id}/solicitudes/admin/${s.id}/rechazar|}" method="post">
+                <button class="btn-sm btn-danger" type="submit"><i class="fas fa-xmark"></i> Rechazar</button>
+              </form>
+            </div>
+          </div>
+          <div class="vacio" th:if="${#lists.isEmpty(pendientes)}">No hay solicitudes pendientes.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Historial</h2>
+        <div class="tabla-wrap">
+          <table class="tabla">
+            <thead><tr><th>Solicitante</th><th>Estado</th><th>Resuelto por</th><th>Fecha</th></tr></thead>
+            <tbody>
+            <tr th:each="s : ${historial}">
+              <td th:text="${s.solicitante.name}">Nombre</td>
+              <td>
+                <span class="pill"
+                      th:classappend="${s.estado.name() == 'APROBADA' ? 'pill-ok' : s.estado.name() == 'RECHAZADA' ? 'pill-err' : 'pill-warn'}"
+                      th:text="${s.estado}">PENDIENTE</span>
+              </td>
+              <td th:text="${s.resolvedBy != null ? s.resolvedBy.name : '—'}">—</td>
+              <td th:text="${s.resolvedAt != null ? #temporals.format(s.resolvedAt, 'dd/MM/yyyy HH:mm') : #temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}">—</td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="vacio" th:if="${#lists.isEmpty(historial)}">Sin historial todavía.</div>
+        </div>
+      </section>
+
+      <a class="btn-sm btn-ghost" th:href="@{|/tiendas/${tienda.id}|}"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
+    </div>
+  </main>
 </div>
-
-<h3>Pendientes</h3>
-<table border="1" cellspacing="0" cellpadding="6">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Solicitante</th>
-      <th>Nota</th>
-      <th>Creada</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr th:each="s : ${pendientes}">
-      <td th:text="${s.id}">1</td>
-      <td th:text="${s.solicitante.name}">Nombre</td>
-      <td th:text="${s.nota}">nota</td>
-      <td th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</td>
-      <td>
-        <form th:action="@{|/tiendas/${tienda.id}/solicitudes/admin/${s.id}/aprobar|}" method="post" style="display:inline;">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          <button type="submit">Aprobar</button>
-        </form>
-
-        <form th:action="@{|/tiendas/${tienda.id}/solicitudes/admin/${s.id}/rechazar|}" method="post" style="display:inline;">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-          <button type="submit">Rechazar</button>
-        </form>
-      </td>
-    </tr>
-
-    <tr th:if="${#lists.isEmpty(pendientes)}">
-      <td colspan="5">No hay solicitudes pendientes.</td>
-    </tr>
-  </tbody>
-</table>
-
-<hr/>
-
-<h3>Historial</h3>
-<table border="1" cellspacing="0" cellpadding="6">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Solicitante</th>
-      <th>Estado</th>
-      <th>Resuelto por</th>
-      <th>Resuelto en</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr th:each="s : ${historial}">
-      <td th:text="${s.id}">1</td>
-      <td th:text="${s.solicitante.name}">Nombre</td>
-      <td th:text="${s.estado}">PENDIENTE</td>
-      <td th:text="${s.resolvedBy != null ? s.resolvedBy.name : '-'}">-</td>
-      <td th:text="${s.resolvedAt != null ? #temporals.format(s.resolvedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
-    </tr>
-
-    <tr th:if="${#lists.isEmpty(historial)}">
-      <td colspan="5">Sin historial todavía.</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>
-  <a th:href="@{|/tiendas/${tienda.id}|}">Volver a tienda</a>
-</p>
-
 </body>
 </html>

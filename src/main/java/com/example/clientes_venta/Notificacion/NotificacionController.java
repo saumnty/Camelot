@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.clientes_venta.Clientes.ClienteFrecuenteService;
+import com.example.clientes_venta.Compra.CompraRepository;
+import com.example.clientes_venta.Compra.EstadoCompra;
 import com.example.clientes_venta.Tienda.Tienda;
 import com.example.clientes_venta.Tienda.TiendaContexto;
 import com.example.clientes_venta.Tienda.TiendaSolicitudAdminService;
@@ -27,15 +29,18 @@ public class NotificacionController {
     private final TiendaContexto contexto;
     private final TiendaSolicitudAdminService solicitudesAdmin;
     private final ClienteFrecuenteService frecuentes;
+    private final CompraRepository compraRepo;
 
     public NotificacionController(NotificacionService notificaciones,
                                   TiendaContexto contexto,
                                   TiendaSolicitudAdminService solicitudesAdmin,
-                                  ClienteFrecuenteService frecuentes) {
+                                  ClienteFrecuenteService frecuentes,
+                                  CompraRepository compraRepo) {
         this.notificaciones = notificaciones;
         this.contexto = contexto;
         this.solicitudesAdmin = solicitudesAdmin;
         this.frecuentes = frecuentes;
+        this.compraRepo = compraRepo;
     }
 
     @GetMapping("/notificaciones")
@@ -47,12 +52,17 @@ public class NotificacionController {
 
         model.addAttribute("solicitudesDueno", solicitudesAdmin.pendientesPara(u, mias));
         model.addAttribute("solicitudesFrecuente", frecuentes.pendientes(mias));
+        model.addAttribute("pedidosPendientes", mias.isEmpty() ? List.of()
+                : compraRepo.findByTienda_IdInAndEstadoOrderByFechaDesc(mias, EstadoCompra.PENDIENTE));
         model.addAttribute("notificaciones", notificaciones.recientes(u, 100));
         return "notificaciones";
     }
 
-    /** Clic en una notificación: se marca leída y te lleva a donde corresponde. */
-    @PostMapping("/notificaciones/{id}/abrir")
+    /**
+     * Clic en una notificación: se marca leída y te lleva a donde corresponde.
+     * Es GET (un enlace normal) para que nunca falle por el token CSRF de un formulario viejo.
+     */
+    @GetMapping("/notificaciones/{id}/abrir")
     public String abrir(@PathVariable Long id, Authentication auth) {
         String enlace = notificaciones.abrir(id, contexto.usuario(auth));
         // Solo rutas internas (evita redirecciones a otros sitios)

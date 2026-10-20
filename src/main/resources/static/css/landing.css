@@ -2778,3 +2778,182 @@ body.nuevo-producto-page {
   color: #3730a3;
 }
 .modal-footer-right form { display: inline-flex; gap: 8px; align-items: center; }
+
+/* Notificaciones como enlace */
+a.item { text-decoration: none; color: inherit; }
+a.item:hover { border-color: #c7d2fe; }
+
+/* Celular: tablas y botones del buzón sin desbordar */
+@media (max-width: 768px) {
+    .item-actions { width: 100%; }
+    .item-actions form, .item-actions a { flex: 1; }
+    .item-actions .btn-sm { width: 100%; justify-content: center; }
+    .inline-form input { width: 100% !important; }
+    .tabs { overflow-x: auto; flex-wrap: nowrap; }
+    .tab { white-space: nowrap; }
+}
+
+/* =====================================================
+   Importar productos + código de barras
+   ===================================================== */
+.pasos { margin: 0 0 12px 20px; display: grid; gap: 8px; color: #374151; line-height: 1.45; }
+.pasos a { color: #4f46e5; text-decoration: underline; }
+.detalle-columnas summary { cursor: pointer; font-weight: 600; color: #4f46e5; margin: 6px 0; }
+
+.zona-archivo {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    padding: 28px 16px; border: 2px dashed #c7d2fe; border-radius: 14px; background: #f8f9ff;
+    color: #4b5563; text-align: center; cursor: pointer;
+}
+.zona-archivo i { font-size: 34px; color: #16a34a; }
+.zona-archivo:hover { border-color: #4f46e5; }
+.zona-archivo input[type=file] { max-width: 100%; font-size: 13px; }
+
+.resumen-import { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 6px 0 12px; }
+.resumen-import .dato { background: #f3f4f6; border-radius: 12px; padding: 12px; text-align: center; }
+.resumen-import .dato b { display: block; font-size: 24px; color: #111827; }
+.resumen-import .dato span { font-size: 12px; color: #6b7280; }
+.resumen-import .dato-ok { background: #dcfce7; }
+.resumen-import .dato-info { background: #e0e7ff; }
+.resumen-import .dato-err { background: #fee2e2; }
+
+.filtros-import { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.chip { padding: 6px 12px; border-radius: 999px; background: #f3f4f6; font-size: 13px; font-weight: 600; color: #374151; }
+.chip.activo { background: #4f46e5; color: #fff; }
+
+.lista-import { display: flex; flex-direction: column; gap: 8px; }
+.fila-import { display: flex; gap: 12px; padding: 10px; border: 1px solid #eef0f4; border-radius: 12px; background: #fff; }
+.fila-import.fila-error { border-color: #fecaca; background: #fff7f7; }
+.fila-foto {
+    width: 52px; height: 52px; flex-shrink: 0; border-radius: 10px; background: #f3f4f6;
+    display: flex; align-items: center; justify-content: center; overflow: hidden; color: #9ca3af;
+}
+.fila-foto img { width: 100%; height: 100%; object-fit: contain; }
+.fila-datos { flex: 1; min-width: 0; }
+.fila-titulo { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 2px; }
+.fila-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+.fila-datos .item-title { overflow-wrap: anywhere; }
+.fila-error { color: #b91c1c; font-size: 13px; margin-top: 4px; }
+.fila-aviso { color: #92400e; font-size: 13px; margin-top: 4px; }
+
+.barra-confirmar {
+    position: sticky; bottom: 0; z-index: 5;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    box-shadow: 0 -6px 18px rgba(0,0,0,.06);
+}
+
+.codigo-barras-box {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 14px; margin-bottom: 18px; border-radius: 12px; background: #f5f3ff; border: 1px solid #ddd6fe;
+}
+.codigo-barras-box label { font-weight: 600; color: #4c1d95; }
+.codigo-barras-fila { display: flex; gap: 8px; flex-wrap: wrap; }
+.codigo-barras-fila input {
+    flex: 1 1 200px; min-width: 0; border: 1px solid #d1d5db; border-radius: 9px; padding: 10px 12px;
+    background: #fff; font-size: 16px; letter-spacing: .04em;
+}
+.codigo-barras-box small { color: #6b7280; }
+.codigo-barras-box small.estado-ok { color: #15803d; font-weight: 600; }
+.codigo-barras-box small.estado-error { color: #b91c1c; font-weight: 600; }
+.escaner-box { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.escaner-box video { width: 100%; max-width: 420px; border-radius: 12px; background: #000; }
+
+@media (max-width: 640px) {
+    .resumen-import { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .barra-confirmar .item-actions { width: 100%; }
+}
+
+/* =====================================================
+   RESPONSIVE GENERAL (celular). Va al final para ganarle
+   a las reglas viejas de escritorio.
+   ===================================================== */
+/* (body ya tiene overflow-x: hidden arriba; no se lo ponemos a html para no romper la barra lateral fija) */
+img, video { max-width: 100%; }
+
+@media (max-width: 768px) {
+    /* Barra superior compacta: logo + nombre + ☰ */
+    .sidebar-header { height: auto !important; padding: 10px 0 !important; margin-bottom: 0 !important; border-bottom: none; }
+    .sidebar.collapsed .sidebar-header { padding: 10px 0 !important; }
+    #Camelot_Logo { width: auto !important; height: 44px !important; padding: 0 0 0 4px !important; }
+    .sidebar.collapsed #Camelot_Text { display: inline !important; font-size: 20px; }
+    .sidebar.collapsed #Camelot_Logo { margin-bottom: 0 !important; }
+    .sidebar:not(.collapsed) .main-nav { margin-top: 8px; }
+
+    /* Encabezados de página: título arriba, acciones abajo a lo ancho */
+    .top-row,
+    .productos-page .top-row,
+    .home-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+    .actions-row,
+    .productos-page .actions-row {
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+        width: 100%;
+        margin: 0 !important;
+    }
+    .actions-row > a,
+    .actions-row > form,
+    .actions-row > button { flex: 1 1 auto; text-align: center; }
+    .actions-row > form button { width: 100%; }
+    .buscador,
+    .productos-page .buscador {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        justify-content: stretch !important;
+    }
+    .buscador input[type="text"],
+    .productos-page .buscador input[type="text"] { width: auto !important; flex: 1; min-width: 0; }
+
+    /* Espacios laterales más chicos */
+    .welcome-section,
+    .productos-page .welcome-section,
+    .compras-page .welcome-section,
+    .ventas-page .welcome-section,
+    .camaras-page .welcome-section { padding: 16px !important; }
+    .productos-container,
+    .productos-page .productos-container,
+    .compras-page .productos-container { padding: 0 16px 24px !important; }
+    .welcome-section h1 { font-size: 24px; }
+
+    /* Tarjetas de productos: botones que se acomodan */
+    .producto-actions { flex-wrap: wrap; gap: 8px; }
+    .producto-actions > * { flex: 1 1 auto; }
+    .btn-primary, .btn-secondary, .btn-danger { padding: 10px 16px; }
+
+    /* Listas tipo tabla (ventas, compras, reportes): que nada se salga */
+    .compras-row, .ventas-row { min-width: 0; }
+    .compras-col { min-width: 0; overflow-wrap: anywhere; }
+
+    /* Ventanas emergentes de ventas */
+    .modal, .modal-xl { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px) !important; max-height: 90vh; overflow-y: auto; }
+    .modal-footer, .modal-footer-right { flex-wrap: wrap; gap: 8px; }
+    .modal-footer-right form { flex-wrap: wrap; width: 100%; }
+    .input-motivo { flex: 1 1 100%; min-width: 0; }
+
+    /* Formularios de 2 columnas → 1 columna */
+    .form-grid { grid-template-columns: 1fr !important; }
+    .nuevo-producto-main { padding: 16px !important; }
+    .nuevo-producto-card { padding: 18px !important; }
+    .form-actions { flex-wrap: wrap; gap: 10px; }
+    .form-actions .btn-primary { flex: 1 1 100%; }
+
+    /* Header simple de formularios (logo + volver) */
+    .simple-header { flex-wrap: wrap; gap: 8px; padding: 12px 16px !important; }
+}
+
+/* Reportes: la tabla de 5 columnas se vuelve deslizable */
+@media (max-width: 560px) {
+    .reporte-tabla-wrap, .compras-list { overflow-x: auto; }
+}
+@media (max-width: 768px) {
+    .compras-row-head, .ventas-row-head { display: none !important; }
+    .inline-form .check { flex: 1 1 100%; }
+    .inline-form > input[type=text], .inline-form > input[type=number] { flex: 1 1 140px; }
+    .content-header { display: none !important; }
+}

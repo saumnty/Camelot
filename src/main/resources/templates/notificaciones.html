@@ -14,10 +14,48 @@
 
             <!-- ===================== POR RESOLVER (solo admins) ===================== -->
             <section class="panel"
-                     th:if="${!#lists.isEmpty(solicitudesDueno) or !#lists.isEmpty(solicitudesFrecuente)}">
+                     th:if="${!#lists.isEmpty(pedidosPendientes) or !#lists.isEmpty(solicitudesDueno) or !#lists.isEmpty(solicitudesFrecuente)}">
                 <h2><i class="fas fa-inbox"></i> Por resolver</h2>
 
                 <div class="lista">
+                    <!-- Pedidos pendientes de mis tiendas: se aceptan aquí mismo -->
+                    <div class="item" th:each="p : ${pedidosPendientes}">
+                        <div class="item-icon"><i class="fas fa-bag-shopping"></i></div>
+                        <div class="item-body">
+                            <div class="item-title">
+                                Pedido #<span th:text="${p.id}">1</span> de
+                                <span th:text="${p.usuario.name}">Cliente</span>
+                                en <b th:text="${p.tienda.nombre}">Tienda</b>
+                            </div>
+                            <div class="item-text">
+                                <b th:text="${'$' + #numbers.formatDecimal(p.total, 1, 'COMMA', 2, 'POINT')}">$0</b>
+                                · <span th:text="${#lists.size(p.items)} + ' producto(s)'">1 producto</span>
+                                <th:block th:if="${p.metodoPago != null}">
+                                    · <span th:text="${p.metodoPago.etiqueta() + ' (' + p.estadoPago.etiqueta() + ')'}">Tarjeta</span>
+                                </th:block>
+                            </div>
+                            <div class="item-text">
+                                <span th:each="it, st : ${p.items}"
+                                      th:text="${it.cantidad + '× ' + it.producto.name + (st.last ? '' : ', ')}">1× Producto</span>
+                            </div>
+                            <div class="item-meta" th:text="${#temporals.format(p.fecha, 'dd/MM/yyyy HH:mm')}">fecha</div>
+                        </div>
+                        <div class="item-actions">
+                            <form th:action="@{/ventas/{id}/aprobar(id=${p.id})}" method="post">
+                                <input type="hidden" name="tiendaId" th:value="${p.tienda.id}">
+                                <input type="hidden" name="volver" value="buzon">
+                                <button class="btn-sm btn-ok" type="submit"><i class="fas fa-check"></i> Aceptar</button>
+                            </form>
+                            <form th:action="@{/ventas/{id}/cancelar(id=${p.id})}" method="post"
+                                  onsubmit="return confirm('¿Rechazar este pedido? Si ya se pagó con tarjeta, se reembolsa.');">
+                                <input type="hidden" name="tiendaId" th:value="${p.tienda.id}">
+                                <input type="hidden" name="volver" value="buzon">
+                                <button class="btn-sm btn-danger" type="submit"><i class="fas fa-xmark"></i> Rechazar</button>
+                            </form>
+                            <a class="btn-sm btn-ghost" th:href="@{/ventas(tiendaId=${p.tienda.id})}">Ver / editar</a>
+                        </div>
+                    </div>
+
                     <!-- Solicitudes "soy dueño" -->
                     <div class="item" th:each="s : ${solicitudesDueno}">
                         <div class="item-icon"><i class="fas fa-user-shield"></i></div>
@@ -95,9 +133,9 @@
                 </div>
 
                 <div class="lista">
-                    <form class="item" th:each="n : ${notificaciones}"
+                    <a class="item" th:each="n : ${notificaciones}"
                           th:classappend="${!n.leida} ? ' no-leida'"
-                          th:action="@{/notificaciones/{id}/abrir(id=${n.id})}" method="post">
+                       th:href="@{/notificaciones/{id}/abrir(id=${n.id})}">
                         <div class="item-icon">
                             <i class="fas" th:classappend="${
                                 n.tipo.name() == 'COMPRA_CONFIRMADA' ? 'fa-circle-check' :
@@ -115,9 +153,9 @@
                             <div class="item-meta" th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</div>
                         </div>
                         <div class="item-actions" th:if="${n.enlace != null}">
-                            <button class="btn-sm btn-ghost" type="submit">Ver <i class="fas fa-arrow-right"></i></button>
+                            <span class="btn-sm btn-ghost">Ver <i class="fas fa-arrow-right"></i></span>
                         </div>
-                    </form>
+                    </a>
 
                     <div class="vacio" th:if="${#lists.isEmpty(notificaciones)}">
                         <i class="fas fa-bell-slash"></i> No tienes notificaciones todavía.

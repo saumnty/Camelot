@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import com.example.clientes_venta.Producto.Producto;
 import com.example.clientes_venta.Producto.ProductoRepository;
 import com.example.clientes_venta.Producto.ProductoService;
+import com.example.clientes_venta.Producto.importar.Medidas;
 import com.example.clientes_venta.Tienda.Tienda;
 import com.example.clientes_venta.Tienda.TiendaRepository;
 
@@ -90,7 +91,7 @@ public class SemillaProductos implements ApplicationRunner {
                     p.setPrecio(decimal(c[3]));
                     p.setCostoProveedor(decimal(c[4]));
                     p.setStock(c[5].isBlank() ? null : Integer.valueOf(c[5].trim()));
-                    p.setUnidadMedida(c[6].isBlank() ? null : c[6].trim());
+                    p.setUnidadMedida(Medidas.normalizarUnidad(c[6]));   // "L" → "l", "pza" → "pieza"
                     p.setCantidadMedida(c[7].isBlank() ? null : Double.valueOf(c[7].trim()));
                     p.setImagenUrl(c[8].isBlank() ? null : c[8].trim());
                     p.setTienda(tienda);

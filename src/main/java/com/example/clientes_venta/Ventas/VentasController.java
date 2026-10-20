@@ -129,6 +129,11 @@ public class VentasController {
 
     private interface Accion { void run(Usuario admin); }
 
+    /** volver=buzon → regresa a Notificaciones en vez de a Ventas. */
+    private static String destino(String volver, String porDefecto) {
+        return "buzon".equals(volver) ? "/notificaciones" : porDefecto;
+    }
+
     private String ejecutar(Long tiendaId, String volverA, Authentication auth, RedirectAttributes ra,
                             String exito, Accion accion) {
         Usuario admin = getUsuario(auth);
@@ -148,16 +153,18 @@ public class VentasController {
 
     @PostMapping("/{id}/aprobar")
     public String aprobar(@PathVariable Long id, @RequestParam Long tiendaId,
+                          @RequestParam(required = false) String volver,
                           Authentication auth, RedirectAttributes ra) {
-        return ejecutar(tiendaId, "/ventas", auth, ra, "Pedido #" + id + " confirmado.",
+        return ejecutar(tiendaId, destino(volver, "/ventas"), auth, ra, "Pedido #" + id + " confirmado.",
                 admin -> ventasService.aprobarVenta(id, tiendaId, admin));
     }
 
     @PostMapping("/{id}/cancelar")
     public String cancelar(@PathVariable Long id, @RequestParam Long tiendaId,
                            @RequestParam(required = false) String motivo,
+                           @RequestParam(required = false) String volver,
                            Authentication auth, RedirectAttributes ra) {
-        return ejecutar(tiendaId, "/ventas", auth, ra, "Pedido #" + id + " cancelado.",
+        return ejecutar(tiendaId, destino(volver, "/ventas"), auth, ra, "Pedido #" + id + " cancelado.",
                 admin -> ventasService.cancelarVenta(id, tiendaId, motivo));
     }
 
