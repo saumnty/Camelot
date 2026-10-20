@@ -37,3 +37,6 @@ openJdk-25/
 openJdk-25/lib
 ### Python ###
 __pycache__/
+
+### CSV generados por scripts/openfoodfacts_a_csv.py ###
+productos_off_*.csv
