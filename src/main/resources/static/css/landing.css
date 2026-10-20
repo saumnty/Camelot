@@ -2778,3 +2778,17 @@ body.nuevo-producto-page {
   color: #3730a3;
 }
 .modal-footer-right form { display: inline-flex; gap: 8px; align-items: center; }
+
+/* Notificaciones como enlace */
+a.item { text-decoration: none; color: inherit; }
+a.item:hover { border-color: #c7d2fe; }
+
+/* Celular: tablas y botones del buzón sin desbordar */
+@media (max-width: 768px) {
+    .item-actions { width: 100%; }
+    .item-actions form, .item-actions a { flex: 1; }
+    .item-actions .btn-sm { width: 100%; justify-content: center; }
+    .inline-form input { width: 100% !important; }
+    .tabs { overflow-x: auto; flex-wrap: nowrap; }
+    .tab { white-space: nowrap; }
+}

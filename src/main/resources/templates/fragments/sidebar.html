@@ -195,6 +195,8 @@
             var btn = aside && aside.querySelector('.menu-toggle');
             if (!btn || btn.dataset.bound) return;
             btn.dataset.bound = '1';
+            // En celular el menú empieza cerrado (solo logo + botón ☰) para no tapar la página
+            if (window.matchMedia('(max-width: 768px)').matches) aside.classList.add('collapsed');
             btn.addEventListener('click', function (e) {
                 e.stopImmediatePropagation();
                 aside.classList.toggle('collapsed');

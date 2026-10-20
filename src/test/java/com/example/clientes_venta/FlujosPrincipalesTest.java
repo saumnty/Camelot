@@ -247,12 +247,17 @@ class FlujosPrincipalesTest {
                 .andExpect(redirectedUrl("/compras"));
         Compra c = compraRepo.findByUsuario_IdOrderByFechaDesc(cliente.getId()).get(0);
         assertThat(c.getMetodoPago()).isEqualTo(MetodoPago.FIADO);
+
+        // El pedido aparece en el buzón del dueño con botón para aceptarlo
+        mvc.perform(get("/notificaciones").with(como(dueno)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/ventas/" + c.getId() + "/aprobar")));
         assertThat(c.getEstado()).isEqualTo(EstadoCompra.PENDIENTE);
 
         // 4) El dueño confirma → se carga a la cuenta y baja el stock
         mvc.perform(post("/ventas/" + c.getId() + "/aprobar").with(como(dueno)).with(csrf())
-                        .param("tiendaId", tienda.getId().toString()))
-                .andExpect(status().is3xxRedirection());
+                        .param("tiendaId", tienda.getId().toString()).param("volver", "buzon"))
+                .andExpect(redirectedUrl("/notificaciones?tiendaId=" + tienda.getId()));
         assertThat(compraRepo.findById(c.getId()).orElseThrow().getEstadoPago()).isEqualTo(EstadoPago.A_CUENTA);
         assertThat(clienteTiendaRepo.findById(ct.getId()).orElseThrow().getSaldo()).isEqualByComparingTo("20.00");
         assertThat(productoRepo.findById(refresco.getId()).orElseThrow().getStock()).isEqualTo(9);
