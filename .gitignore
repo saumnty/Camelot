@@ -35,3 +35,5 @@ build/
 openJdk-25/
 
 openJdk-25/lib
+### Python ###
+__pycache__/
