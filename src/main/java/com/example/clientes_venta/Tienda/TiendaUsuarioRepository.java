@@ -131,6 +131,35 @@ public interface TiendaUsuarioRepository extends JpaRepository<TiendaUsuario, Lo
 
     Optional<TiendaUsuario> findByTienda_IdAndUsuario_Id(Long tiendaId, Integer usuarioId);
 
+    // ======= Barra lateral / notificaciones =======
+
+    @Query("""
+        select tu.tienda
+        from TiendaUsuario tu
+        where tu.usuario.id = :usuarioId
+          and tu.rol = :rol
+          and tu.estado = :estado
+        order by tu.tienda.nombre asc
+    """)
+    List<Tienda> findTiendasByUsuarioRolEstado(
+            @Param("usuarioId") Integer usuarioId,
+            @Param("rol") RolTienda rol,
+            @Param("estado") EstadoMembresia estado
+    );
+
+    @Query("""
+        select tu.usuario
+        from TiendaUsuario tu
+        where tu.tienda.id = :tiendaId
+          and tu.rol = :rol
+          and tu.estado = :estado
+    """)
+    List<com.example.clientes_venta.Usuario.Usuario> findUsuariosByTiendaRolEstado(
+            @Param("tiendaId") Long tiendaId,
+            @Param("rol") RolTienda rol,
+            @Param("estado") EstadoMembresia estado
+    );
+
     boolean existsByTienda_IdAndUsuario_IdAndRol(
                 Long tiendaId,
                 Integer usuarioId,

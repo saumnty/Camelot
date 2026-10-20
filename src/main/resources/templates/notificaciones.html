@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/sidebar :: head('Notificaciones')}"></head>
+<body>
+<div class="app-container">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="main-content">
+        <div class="page-wrap">
+            <h1 class="page-title">Notificaciones</h1>
+            <p class="page-subtitle">Avisos de tus compras y, si administras una tienda, solicitudes por resolver.</p>
+
+            <th:block th:replace="~{fragments/sidebar :: flash}"></th:block>
+
+            <!-- ===================== POR RESOLVER (solo admins) ===================== -->
+            <section class="panel"
+                     th:if="${!#lists.isEmpty(solicitudesDueno) or !#lists.isEmpty(solicitudesFrecuente)}">
+                <h2><i class="fas fa-inbox"></i> Por resolver</h2>
+
+                <div class="lista">
+                    <!-- Solicitudes "soy dueño" -->
+                    <div class="item" th:each="s : ${solicitudesDueno}">
+                        <div class="item-icon"><i class="fas fa-user-shield"></i></div>
+                        <div class="item-body">
+                            <div class="item-title">
+                                <span th:text="${s.solicitante.name}">Nombre</span>
+                                quiere administrar
+                                <b th:text="${s.tienda.nombre}">Tienda</b>
+                            </div>
+                            <div class="item-text" th:text="${s.solicitante.email}">correo</div>
+                            <div class="item-text" th:if="${s.nota != null}" th:text="'“' + ${s.nota} + '”'">nota</div>
+                            <div class="item-meta" th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</div>
+                        </div>
+                        <div class="item-actions">
+                            <form th:action="@{/tiendas/{t}/solicitudes/admin/{id}/aprobar(t=${s.tienda.id}, id=${s.id})}" method="post">
+                                <input type="hidden" name="volver" value="buzon">
+                                <button class="btn-sm btn-ok" type="submit"><i class="fas fa-check"></i> Aprobar</button>
+                            </form>
+                            <form th:action="@{/tiendas/{t}/solicitudes/admin/{id}/rechazar(t=${s.tienda.id}, id=${s.id})}" method="post">
+                                <input type="hidden" name="volver" value="buzon">
+                                <button class="btn-sm btn-danger" type="submit"><i class="fas fa-xmark"></i> Rechazar</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Solicitudes de cliente frecuente / fiado -->
+                    <div class="item" th:each="c : ${solicitudesFrecuente}">
+                        <div class="item-icon"><i class="fas fa-handshake"></i></div>
+                        <div class="item-body">
+                            <div class="item-title">
+                                <span th:text="${c.usuario.name}">Nombre</span>
+                                quiere ser cliente frecuente de
+                                <b th:text="${c.tienda.nombre}">Tienda</b>
+                            </div>
+                            <div class="item-text">
+                                <span th:text="${c.usuario.email}">correo</span>
+                                <span th:if="${c.usuario.telefono != null}" th:text="' · ' + ${c.usuario.telefono}"></span>
+                            </div>
+                            <div class="item-text" th:if="${c.notaSolicitud != null}" th:text="'“' + ${c.notaSolicitud} + '”'">nota</div>
+                            <div class="item-meta" th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</div>
+
+                            <!-- Aprobar: con o sin fiado -->
+                            <form th:action="@{/clientes/frecuentes/{id}/aprobar(id=${c.id})}" method="post"
+                                  class="inline-form" style="margin-top:10px;">
+                                <input type="hidden" name="tiendaId" th:value="${c.tienda.id}">
+                                <label class="check" style="align-items:center;">
+                                    <input type="checkbox" name="fiado" value="true"
+                                           th:attr="data-limite=${'lim-' + c.id}"
+                                           onchange="document.getElementById(this.dataset.limite).required = this.checked">
+                                    Darle fiado hasta $
+                                </label>
+                                <input type="number" step="0.01" min="1" name="limite" th:id="${'lim-' + c.id}" placeholder="500.00">
+                                <input type="text" name="nota" placeholder="Nota (opcional)" style="width:180px;">
+                                <button class="btn-sm btn-ok" type="submit"><i class="fas fa-check"></i> Aprobar</button>
+                            </form>
+                        </div>
+                        <div class="item-actions">
+                            <form th:action="@{/clientes/frecuentes/{id}/rechazar(id=${c.id})}" method="post">
+                                <input type="hidden" name="tiendaId" th:value="${c.tienda.id}">
+                                <button class="btn-sm btn-danger" type="submit"><i class="fas fa-xmark"></i> Rechazar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================== HISTORIAL DE AVISOS ===================== -->
+            <section class="panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px;">
+                    <h2 style="margin:0;"><i class="fas fa-bell"></i> Avisos</h2>
+                    <form th:action="@{/notificaciones/leer-todas}" method="post"
+                          th:if="${navNotifCount != null and navNotifCount > 0}">
+                        <button class="btn-sm btn-ghost" type="submit"><i class="fas fa-check-double"></i> Marcar todo como leído</button>
+                    </form>
+                </div>
+
+                <div class="lista">
+                    <form class="item" th:each="n : ${notificaciones}"
+                          th:classappend="${!n.leida} ? ' no-leida'"
+                          th:action="@{/notificaciones/{id}/abrir(id=${n.id})}" method="post">
+                        <div class="item-icon">
+                            <i class="fas" th:classappend="${
+                                n.tipo.name() == 'COMPRA_CONFIRMADA' ? 'fa-circle-check' :
+                                n.tipo.name() == 'COMPRA_CANCELADA' ? 'fa-ban' :
+                                n.tipo.name() == 'COMPRA_REEMBOLSADA' ? 'fa-rotate-left' :
+                                n.tipo.name() == 'COMPRA_NUEVA' ? 'fa-bag-shopping' :
+                                n.tipo.name() == 'STOCK_BAJO' ? 'fa-box-open' :
+                                n.tipo.name() == 'FIADO_MOVIMIENTO' ? 'fa-wallet' :
+                                n.tipo.name().startsWith('SOLICITUD_FRECUENTE') ? 'fa-handshake' :
+                                n.tipo.name().startsWith('SOLICITUD_ADMIN') ? 'fa-user-shield' : 'fa-bell'}"></i>
+                        </div>
+                        <div class="item-body">
+                            <div class="item-title" th:text="${n.titulo}">Título</div>
+                            <div class="item-text" th:if="${n.mensaje != null}" th:text="${n.mensaje}">Mensaje</div>
+                            <div class="item-meta" th:text="${#temporals.format(n.createdAt, 'dd/MM/yyyy HH:mm')}">fecha</div>
+                        </div>
+                        <div class="item-actions" th:if="${n.enlace != null}">
+                            <button class="btn-sm btn-ghost" type="submit">Ver <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </form>
+
+                    <div class="vacio" th:if="${#lists.isEmpty(notificaciones)}">
+                        <i class="fas fa-bell-slash"></i> No tienes notificaciones todavía.
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

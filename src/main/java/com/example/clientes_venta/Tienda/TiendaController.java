@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.clientes_venta.Clientes.ClienteFrecuenteService;
+import com.example.clientes_venta.Configuracion.ConfiguracionTiendaService;
 
 import com.example.clientes_venta.Producto.Producto;
 import com.example.clientes_venta.Producto.ProductoRepository;
@@ -31,6 +36,8 @@ public class TiendaController {
     private final ProductoService productoService;
     private final UsuarioRepo usuarioRepo;
     private final TiendaSolicitudAdminService solicitudAdminService;
+    private final ConfiguracionTiendaService configService;
+    private final ClienteFrecuenteService clienteFrecuenteService;
 
     public TiendaController(
             TiendaService tiendaService,
@@ -39,7 +46,9 @@ public class TiendaController {
             TiendaProveedorRepository tiendaProveedorRepository,
             ProductoService productoService,
             UsuarioRepo usuarioRepo,
-            TiendaSolicitudAdminService solicitudAdminService
+            TiendaSolicitudAdminService solicitudAdminService,
+            ConfiguracionTiendaService configService,
+            ClienteFrecuenteService clienteFrecuenteService
     ) {
         this.tiendaService = tiendaService;
         this.tiendaRepository = tiendaRepository;
@@ -48,6 +57,8 @@ public class TiendaController {
         this.productoService = productoService;
         this.usuarioRepo = usuarioRepo;
         this.solicitudAdminService = solicitudAdminService;
+        this.configService = configService;
+        this.clienteFrecuenteService = clienteFrecuenteService;
     }
 
     // ✅ Detalle real de tienda/proveedora
@@ -97,12 +108,37 @@ public class TiendaController {
         model.addAttribute("solicitudPendiente", solicitudPendiente);
         // ✅ ==============================================
 
-        // guarda la tienda actual en sesión (clave que /config lee)
-        session.setAttribute("tiendaId", id);
+        // ✅ Cliente frecuente / fiado
+        model.addAttribute("permiteFrecuentes",
+                t.getTipo() == TipoTienda.NORMAL && configService.de(t.getId()).isPermiteClientesFrecuentes());
+        model.addAttribute("clienteFrecuente",
+                authUser == null ? null : clienteFrecuenteService.de(t.getId(), authUser).orElse(null));
 
+        // Ya NO se guarda la tienda visitada en sesión: eso hacía que la configuración
+        // de "Abarrotes Mendoza" le apareciera a cualquier cliente que la visitaba.
         return "tienda_detalle";
     }
 
+
+    // ✅ Cliente pide ser "cliente frecuente" de esta tienda → llega al buzón de los admins
+    @PostMapping("/{id}/frecuente")
+    public String solicitarFrecuente(@PathVariable Long id,
+                                     @RequestParam(required = false) String nota,
+                                     Authentication auth,
+                                     RedirectAttributes ra) {
+        Usuario u = auth == null ? null : usuarioRepo.findByEmail(auth.getName()).orElse(null);
+        if (u == null) return "redirect:/login";
+        Tienda t = tiendaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tienda no existe"));
+
+        String error = clienteFrecuenteService.solicitar(t, u, nota);
+        if (error != null) {
+            ra.addFlashAttribute("mensajeError", error);
+        } else {
+            ra.addFlashAttribute("mensajeExito", "Solicitud enviada. Te avisaremos en Notificaciones.");
+        }
+        return "redirect:/tiendas/" + id;
+    }
 
     // ✅ FORM NUEVA TIENDA
     @GetMapping("/nuevo")
@@ -113,13 +149,17 @@ public class TiendaController {
 
     // ✅ GUARDAR TIENDA + owner_id + fecha + tipo default
     @PostMapping("/guardar")
-    public String guardarTienda(@ModelAttribute("tienda") Tienda tienda, Authentication auth) {
+    public String guardarTienda(@ModelAttribute("tienda") Tienda tienda, Authentication auth, RedirectAttributes ra) {
 
         if (auth == null) return "redirect:/login";
 
         Usuario u = usuarioRepo.findByEmail(auth.getName())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
 
+        // Siempre es una tienda NUEVA: si el formulario trajera un id, se podría
+        // sobrescribir la tienda de otra persona.
+        tienda.setId(null);
+        tienda.setActiva(true);
         tienda.setOwner(u);
 
         if (tienda.getFechaDeCreacion() == null) {
@@ -130,7 +170,8 @@ public class TiendaController {
             tienda.setTipo(TipoTienda.NORMAL);
         }
 
-        tiendaService.guardarTienda(tienda);
-        return "redirect:/home";
+        Tienda nueva = tiendaService.guardarTienda(tienda);
+        ra.addFlashAttribute("mensajeExito", "¡Listo! Tu negocio está creado. Agrega tus productos.");
+        return "redirect:/productos?tiendaId=" + nueva.getId();
     }
 }

@@ -40,6 +40,19 @@ A key design goal is to ensure that **sales are validated by administrators befo
 - Planned reporting by product, category, and provider.
 - External purchase registration for accurate daily totals.
 
+### Role-based navigation & notifications
+- Single sidebar (`templates/fragments/sidebar.html`): every user sees the **customer** menu;
+  store admins also get a **"Mi tienda"** section; inside a store you don't own, a store sub-menu appears.
+- Notification center: owner requests, frequent-customer requests, order updates, low stock.
+
+### Frequent customers & store credit ("fiado")
+- Customers ask to become frequent customers; admins approve from the notification center
+  with an optional credit limit. Credit purchases are charged when the admin confirms them.
+
+### Payments
+- Per-store payment methods: card (simulated gateway), cash on pickup, store credit.
+- Refunds for paid orders (`REEMBOLSADA`), per-store tax (IVA) breakdown on tickets.
+
 ### Camera Module (In Progress)
 - Store-level camera registration (RTSP).
 - Admin-only access to camera feeds.
@@ -76,11 +89,44 @@ A key design goal is to ensure that **sales are validated by administrators befo
 6. The transaction becomes part of the immutable sales record.
 
 ## Running the Project
-1. Configure PostgreSQL and create the database.
-2. Set database credentials in environment variables or application properties.
-3. Build the project using Maven.
-4. Run the Spring Boot application.
-5. Access the platform via browser.
+
+### Local
+1. Create a PostgreSQL database named `clientes_ventas`.
+2. Set `DB_USER` / `DB_PASSWORD` (or edit nothing and use `postgres`/`postgres`).
+3. `./mvnw spring-boot:run` and open http://localhost:8080.
+
+### Render + Supabase
+Render must define these environment variables (never commit passwords):
+
+| Variable | Example |
+|---|---|
+| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://<supabase-host>:5432/postgres?sslmode=require` |
+| `SPRING_DATASOURCE_USERNAME` | `postgres.<project>` |
+| `SPRING_DATASOURCE_PASSWORD` | *(your Supabase password)* |
+
+Hibernate (`ddl-auto=update`) creates new tables/columns on startup. Data fixes live in
+`db/migraciones/`: run `01_antes_de_desplegar.sql` **before** deploying and
+`02_despues_de_desplegar.sql` **after** the first deploy (Supabase → SQL Editor).
+
+### Demo catalog
+Load ~75 typical Mexican grocery products into an existing store (id 5 here):
+
+```
+./mvnw spring-boot:run -Dspring-boot.run.arguments="--camelot.semilla.tienda-id=5"
+```
+
+For real products (names, brands, photos) from Open Food Facts, run
+`python3 scripts/openfoodfacts_a_csv.py` and pass `--camelot.semilla.archivo=file:productos_off.csv`.
+
+### Payments (simulated)
+`camelot.pagos.proveedor=simulado` — no real money moves. Test cards:
+`4242 4242 4242 4242` (approved), `5555 5555 5555 4444` (approved),
+`4000 0000 0000 0002` (declined); any future date and CVV.
+To go live, implement `Pago/ProveedorPago` for Mercado Pago, Stripe, Openpay or Conekta
+(card data is tokenized by the provider and never reaches this server).
+
+### Tests
+`./mvnw verify` (needs a PostgreSQL; GitHub Actions starts one automatically, see `.github/workflows/ci.yml`).
 
 ## Project Status
 Camelot is an **active and evolving project**, with ongoing improvements focused on:

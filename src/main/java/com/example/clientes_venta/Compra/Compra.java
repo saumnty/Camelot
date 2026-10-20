@@ -1,5 +1,8 @@
 package com.example.clientes_venta.Compra;
 
+import com.example.clientes_venta.Pago.EstadoPago;
+import com.example.clientes_venta.Pago.MetodoPago;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,7 +14,11 @@ import com.example.clientes_venta.Usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+// @Getter/@Setter en vez de @Data: @Data genera toString/equals/hashCode que recorren
+// Compra.items → CompraItem.compra → Compra.items... sin fin (StackOverflowError).
+// En entidades JPA es mejor no generar esos métodos.
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,4 +56,32 @@ public class Compra {
 
     @Column(length = 255)
     private String motivo;
+
+    // ================= Pago e impuestos =================
+    // Columnas NUEVAS y nullables a propósito: las compras viejas no las tienen
+    // y Hibernate (ddl-auto=update) no puede agregar NOT NULL a una tabla con datos.
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "metodo_pago", length = 20)
+    private MetodoPago metodoPago;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_pago", length = 20)
+    private EstadoPago estadoPago;
+
+    // total = subtotal + impuestos
+    @Column(precision = 12, scale = 2)
+    private BigDecimal subtotal;
+
+    @Column(precision = 12, scale = 2)
+    private BigDecimal impuestos;
+
+    /** Para compras viejas sin desglose. */
+    public BigDecimal getSubtotalMostrado() {
+        return subtotal != null ? subtotal : total;
+    }
+
+    public BigDecimal getImpuestosMostrados() {
+        return impuestos != null ? impuestos : BigDecimal.ZERO;
+    }
 }

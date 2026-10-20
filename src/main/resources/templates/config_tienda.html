@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/sidebar :: head('Configuración de la tienda')}"></head>
+<body>
+<div class="app-container">
+    <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="main-content">
+        <div class="page-wrap">
+            <h1 class="page-title">Configuración de la tienda</h1>
+            <p class="page-subtitle">
+                Solo para administradores de <b th:text="${tienda.nombre}">la tienda</b>.
+                Estos cambios no afectan a otras tiendas.
+            </p>
+
+            <th:block th:replace="~{fragments/sidebar :: flash}"></th:block>
+
+            <form th:action="@{/config/tienda}" th:object="${form}" method="post">
+                <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+
+                <div class="flash flash-err" th:if="${#fields.hasAnyErrors()}">
+                    <strong>Revisa estos campos:</strong>
+                    <ul style="margin:6px 0 0 18px;">
+                        <li th:each="e : ${#fields.allErrors()}" th:text="${e}">error</li>
+                    </ul>
+                </div>
+
+                <!-- ============ Lo que ven los clientes ============ -->
+                <section class="panel">
+                    <h2><i class="fas fa-store"></i> Tu negocio</h2>
+                    <div class="campos">
+                        <div class="campo">
+                            <label for="nombre">Nombre del negocio</label>
+                            <input id="nombre" type="text" th:field="*{nombre}" maxlength="120" required>
+                        </div>
+                        <div class="campo">
+                            <label for="categoria">Giro / categoría</label>
+                            <input id="categoria" type="text" th:field="*{categoria}" maxlength="80" placeholder="Abarrotes">
+                        </div>
+                        <div class="campo">
+                            <label for="ciudad">Ciudad / alcaldía</label>
+                            <input id="ciudad" type="text" th:field="*{ciudad}" maxlength="80" placeholder="Cuajimalpa, CDMX">
+                        </div>
+                        <div class="campo">
+                            <label for="horario">Horario</label>
+                            <input id="horario" type="text" th:field="*{horario}" maxlength="120" placeholder="Lun a Sáb 8:00–21:00">
+                        </div>
+                        <div class="campo campo-full">
+                            <label for="descripcion">Descripción</label>
+                            <textarea id="descripcion" th:field="*{descripcion}" rows="3" maxlength="500"></textarea>
+                        </div>
+                        <div class="campo campo-full">
+                            <label for="googleMapsUrl">Enlace de Google Maps</label>
+                            <input id="googleMapsUrl" type="url" th:field="*{googleMapsUrl}" placeholder="https://maps.app.goo.gl/...">
+                        </div>
+                        <label class="check campo-full">
+                            <input type="checkbox" th:field="*{activa}">
+                            <span><b>Tienda visible</b><small>Si la apagas, deja de aparecer en el listado de tiendas.</small></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- ============ Datos fiscales / ticket ============ -->
+                <section class="panel">
+                    <h2><i class="fas fa-file-invoice"></i> Datos fiscales y ticket</h2>
+                    <div class="campos">
+                        <div class="campo">
+                            <label for="rfc">RFC</label>
+                            <input id="rfc" type="text" th:field="*{rfc}" maxlength="13" style="text-transform:uppercase;">
+                        </div>
+                        <div class="campo">
+                            <label for="razonSocial">Razón social</label>
+                            <input id="razonSocial" type="text" th:field="*{razonSocial}" maxlength="150">
+                        </div>
+                        <div class="campo">
+                            <label for="telefono">Teléfono</label>
+                            <input id="telefono" type="tel" th:field="*{telefono}" maxlength="30">
+                        </div>
+                        <div class="campo">
+                            <label for="emailContacto">Correo de contacto</label>
+                            <input id="emailContacto" type="email" th:field="*{emailContacto}" maxlength="120">
+                        </div>
+                        <div class="campo campo-full">
+                            <label for="direccion">Dirección</label>
+                            <input id="direccion" type="text" th:field="*{direccion}" maxlength="180">
+                        </div>
+                        <div class="campo campo-full">
+                            <label for="mensajeTicket">Mensaje al pie del ticket</label>
+                            <input id="mensajeTicket" type="text" th:field="*{mensajeTicket}" maxlength="200"
+                                   placeholder="¡Gracias por su compra!">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Impuestos ============ -->
+                <section class="panel">
+                    <h2><i class="fas fa-percent"></i> Impuestos y moneda</h2>
+                    <div class="campos">
+                        <div class="campo">
+                            <label for="iva">IVA (%)</label>
+                            <input id="iva" type="number" step="0.01" min="0" max="100" th:field="*{iva}" required>
+                        </div>
+                        <div class="campo">
+                            <label for="moneda">Moneda</label>
+                            <select id="moneda" th:field="*{moneda}">
+                                <option value="MXN">MXN - Peso mexicano</option>
+                                <option value="USD">USD - Dólar estadounidense</option>
+                            </select>
+                        </div>
+                        <label class="check campo-full">
+                            <input type="checkbox" th:field="*{preciosIncluyenIva}">
+                            <span><b>Mis precios ya incluyen IVA</b>
+                                <small>Lo normal en tienda. El ticket solo desglosa el IVA. Si lo apagas, el IVA se suma al total al pagar.</small></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- ============ Ventas ============ -->
+                <section class="panel">
+                    <h2><i class="fas fa-bag-shopping"></i> Ventas e inventario</h2>
+                    <div class="campos">
+                        <label class="check campo-full">
+                            <input type="checkbox" th:field="*{autoConfirmarSiHayStock}">
+                            <span><b>Auto-confirmar pedidos si hay stock</b>
+                                <small>Si algún producto tiene stock vacío o insuficiente, el pedido queda PENDIENTE para que lo revises. Los pedidos con fiado siempre esperan tu autorización.</small></span>
+                        </label>
+                        <div class="campo">
+                            <label for="stockBajoUmbral">Avisarme cuando el stock baje de</label>
+                            <input id="stockBajoUmbral" type="number" min="0" th:field="*{stockBajoUmbral}" placeholder="Ej. 5 (vacío = no avisar)">
+                            <small>Te llega una notificación al confirmar una venta.</small>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ Pagos ============ -->
+                <section class="panel">
+                    <h2><i class="fas fa-credit-card"></i> Formas de pago</h2>
+                    <div class="flash flash-info" style="margin-bottom:14px;">
+                        <i class="fas fa-flask"></i>
+                        Los pagos con tarjeta están en <b>modo simulado</b>: no se cobra dinero real.
+                    </div>
+                    <div class="campos">
+                        <label class="check">
+                            <input type="checkbox" th:field="*{aceptaTarjeta}">
+                            <span><b>Tarjeta</b><small>Visa, Mastercard, American Express.</small></span>
+                        </label>
+                        <label class="check">
+                            <input type="checkbox" th:field="*{aceptaEfectivo}">
+                            <span><b>Efectivo al recoger</b><small>El cliente paga cuando pasa por su pedido.</small></span>
+                        </label>
+                        <label class="check">
+                            <input type="checkbox" th:field="*{aceptaFiado}">
+                            <span><b>Fiado</b><small>Solo para clientes frecuentes a los que les autorices crédito.</small></span>
+                        </label>
+                        <label class="check">
+                            <input type="checkbox" th:field="*{permiteReembolsos}">
+                            <span><b>Permitir reembolsos de pedidos confirmados</b><small>Devoluciones después de entregar. Si cancelas un pedido pendiente que ya se cobró con tarjeta, el dinero se devuelve siempre.</small></span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- ============ Clientes ============ -->
+                <section class="panel">
+                    <h2><i class="fas fa-users"></i> Clientes</h2>
+                    <label class="check">
+                        <input type="checkbox" th:field="*{permiteClientesFrecuentes}">
+                        <span><b>Aceptar solicitudes de cliente frecuente</b>
+                            <small>Aparece el botón "Soy cliente frecuente" en tu tienda; las solicitudes llegan a Notificaciones.</small></span>
+                    </label>
+                </section>
+
+                <div class="form-actions" style="margin-bottom:40px;">
+                    <button type="submit" class="btn-primary">Guardar configuración</button>
+                    <a class="btn-secondary-link" th:href="@{/productos(tiendaId=${tiendaId})}">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/sidebar :: head('Compras a proveedor')}"></head>
+<body>
+<div class="app-container">
+  <aside th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+  <main class="main-content">
+    <div class="page-wrap">
+      <h1 class="page-title">Compras a proveedor</h1>
+      <p class="page-subtitle">Lo que le pagas a tus proveedores (Bimbo, Coca-Cola, la central de abasto…). Sirve para calcular tu utilidad.</p>
+
+      <th:block th:replace="~{fragments/sidebar :: flash}"></th:block>
+
+      <section class="panel">
+        <h2>Registrar compra</h2>
+        <form th:action="@{/admin/compras-proveedor/guardar}" method="post">
+          <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+          <div class="campos">
+            <div class="campo">
+              <label for="proveedor">Proveedor</label>
+              <input type="text" id="proveedor" name="proveedor" maxlength="120" required placeholder="Ej. Bimbo">
+            </div>
+            <div class="campo">
+              <label for="tipo">Tipo</label>
+              <select id="tipo" name="tipo">
+                <option th:each="t : ${tipos}" th:value="${t}"
+                        th:text="${t.name() == 'PROVEEDOR' ? 'Proveedor' : 'Externa'}">Proveedor</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="total">Total ($)</label>
+              <input type="number" id="total" name="total" step="0.01" min="0" required>
+            </div>
+            <div class="campo">
+              <label for="fecha">Fecha</label>
+              <input type="date" id="fecha" name="fecha" th:value="${fecha}">
+            </div>
+            <div class="campo campo-full">
+              <label for="nota">Nota (opcional)</label>
+              <input type="text" id="nota" name="nota" maxlength="255" placeholder="Ej. Factura A-1234">
+            </div>
+          </div>
+          <div class="form-actions" style="margin-top:14px;">
+            <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Registrar</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          <h2 style="margin:0;">Del día</h2>
+          <form method="get" th:action="@{/admin/compras-proveedor}" class="inline-form">
+            <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+            <input type="date" name="fecha" th:value="${fecha}" style="width:auto;">
+            <button class="btn-sm btn-ghost" type="submit">Ver</button>
+          </form>
+        </div>
+
+        <table class="tabla">
+          <thead><tr><th>Proveedor</th><th>Tipo</th><th>Nota</th><th>Total</th><th></th></tr></thead>
+          <tbody>
+          <tr th:each="g : ${gastos}">
+            <td th:text="${g.proveedor}">Proveedor</td>
+            <td th:text="${g.tipo}">PROVEEDOR</td>
+            <td th:text="${g.nota}"></td>
+            <td th:text="${'$' + #numbers.formatDecimal(g.total, 1, 'COMMA', 2, 'POINT')}">$0</td>
+            <td>
+              <form th:action="@{/admin/compras-proveedor/eliminar/{id}(id=${g.id})}" method="post"
+                    onsubmit="return confirm('¿Eliminar esta compra?');">
+                <input type="hidden" name="tiendaId" th:value="${tiendaId}">
+                <input type="hidden" name="fecha" th:value="${fecha}">
+                <button class="btn-sm btn-danger" type="submit"><i class="fas fa-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="vacio" th:if="${#lists.isEmpty(gastos)}">Sin compras a proveedor este día.</div>
+
+        <h3 th:unless="${#lists.isEmpty(resumenProveedor)}">Por proveedor</h3>
+        <table class="tabla" th:unless="${#lists.isEmpty(resumenProveedor)}">
+          <tr th:each="r : ${resumenProveedor}">
+            <td th:text="${r.proveedor}">Proveedor</td>
+            <td th:text="${'$' + #numbers.formatDecimal(r.total, 1, 'COMMA', 2, 'POINT')}">$0</td>
+          </tr>
+        </table>
+        <p style="margin-top:12px;"><b>Total del día:</b>
+          <span th:text="${'$' + #numbers.formatDecimal(totalGastos, 1, 'COMMA', 2, 'POINT')}">$0.00</span></p>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
+</html>

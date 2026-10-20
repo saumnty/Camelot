@@ -1,8 +1,11 @@
 package com.example.clientes_venta.Clientes;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
+    List<Cliente> findByTienda_IdOrderByNombreAsc(Long tiendaId);
+    Optional<Cliente> findByIdAndTienda_Id(Long id, Long tiendaId);
 }

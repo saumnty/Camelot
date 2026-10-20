@@ -142,6 +142,40 @@ public interface CompraRepository extends JpaRepository<Compra, Long> {
             @Param("finDia") LocalDateTime finDia
     );
 
+    // ==========================
+    // Clientes: quién me ha comprado
+    // ==========================
+    @Query("""
+        select
+            u.id as usuarioId,
+            u.name as nombre,
+            u.email as email,
+            u.telefono as telefono,
+            count(c) as compras,
+            coalesce(sum(c.total), 0) as total,
+            max(c.fecha) as ultima
+        from Compra c
+        join c.usuario u
+        where c.tienda.id = :tiendaId
+          and c.estado = :estado
+        group by u.id, u.name, u.email, u.telefono
+        order by max(c.fecha) desc
+    """)
+    List<CompradorRow> compradores(
+            @Param("tiendaId") Long tiendaId,
+            @Param("estado") EstadoCompra estado
+    );
+
+    interface CompradorRow {
+        Integer getUsuarioId();
+        String getNombre();
+        String getEmail();
+        String getTelefono();
+        Long getCompras();
+        BigDecimal getTotal();
+        LocalDateTime getUltima();
+    }
+
     // ===== Proyecciones =====
     interface TotalDiaRow {
         LocalDate getDia();
